@@ -19,6 +19,7 @@ python = "^3.10"
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.0"
 pylint = "^2.15.9"
+mypy = "^0.991"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -32,3 +33,14 @@ disable = [
     "R0903",  # Too few public methods
 ]
 max-line-length = 120
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+pretty = true
+disallow_any_explicit = false
+disallow_any_generics = false
+warn_unreachable = true
+show_column_numbers = true
+show_error_codes = true
+show_error_context = true
