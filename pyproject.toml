@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "pytemplate"
+name = "user_service"
 version = "0.1.0"
-description = "Template for a Python project"
+description = "User service example"
 authors = [
     "SamWarden <SamWardenSad@gmail.com>",
 ]

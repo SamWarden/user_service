@@ -1,5 +1,3 @@
-==========
-Pytemplate
-==========
-
-Template for a Python project
+============
+User Service
+============
