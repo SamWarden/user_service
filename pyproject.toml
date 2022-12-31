@@ -16,10 +16,21 @@ repository = "https://github.com/SamWarden/pytemplate"
 [tool.poetry.dependencies]
 python = "^3.10"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
 pytest = "^7.2.0"
+
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
 pylint = "^2.15.9"
 mypy = "^0.991"
+flake8 = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
