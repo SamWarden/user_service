@@ -7,14 +7,15 @@ from src.application.base.interfaces.mapper import Mapper
 from src.application.base.interfaces.uow import UnitOfWork
 from src.application.user import dto
 from src.application.user.interfaces.persistence import UserRepo
+from src.domain.base.constants import UNSET
 from src.domain.user.value_objects import UserId, Username
 
 
 @dataclass(frozen=True)
 class UpdateUserData:
-    first_name: str
-    last_name: str
-    username: Username
+    first_name: str = UNSET
+    last_name: str = UNSET
+    username: Username = UNSET
 
 
 @dataclass(frozen=True)
