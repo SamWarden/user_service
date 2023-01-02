@@ -22,3 +22,6 @@ class UserReader(Protocol):
 
     async def get_user_by_username(self, username: Username) -> dto.User:
         raise NotImplementedError
+
+    async def get_users(self) -> tuple[dto.User, ...]:
+        raise NotImplementedError
