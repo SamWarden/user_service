@@ -10,7 +10,7 @@ class GetUsers(Query[tuple[dto.User, ...]]):
     pass
 
 
-class GetUserByUsernameHandler(QueryHandler[GetUsers, tuple[dto.User, ...]]):
+class GetUsersHandler(QueryHandler[GetUsers, tuple[dto.User, ...]]):
     def __init__(self, user_reader: UserReader) -> None:
         self._user_reader = user_reader
 
