@@ -4,9 +4,9 @@ from didiator import Mediator
 from didiator.utils.di_builder import DiBuilder
 from fastapi import FastAPI
 
-from src.presentation.api.controllers.main import setup_controllers
-from src.presentation.api.middlewares.main import setup_middlewares
-from src.presentation.api.providers.main import setup_providers
+from src.presentation.api.controllers import setup_controllers
+from src.presentation.api.middlewares import setup_middlewares
+from src.presentation.api.providers import setup_providers
 
 
 def init_api(
