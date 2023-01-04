@@ -1,18 +1,18 @@
 import time
 from typing import Self
 
+from src.domain.base.exceptions import DomainException
+
 from .base import ValueObject
-from ..exceptions import AppException
 
 
-class NegativeTimestamp(AppException, ValueError):
+class NegativeTimestamp(DomainException, ValueError):
     pass
 
 
 class Timestamp(ValueObject[int]):
-    @classmethod
-    def validate_value(cls, value: int) -> None:
-        if value < 0:
+    def _validate(self) -> None:
+        if self.value < 0:
             raise NegativeTimestamp
 
     @classmethod
