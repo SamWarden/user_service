@@ -1,28 +1,26 @@
 from abc import ABC
+from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
 V = TypeVar("V", bound=Any)
 
 
-class ValueObject(Generic[V], ABC):
-    value: V
+@dataclass(frozen=True)
+class BaseValueObject(ABC):
+    def __post_init__(self) -> None:
+        self._validate()
 
-    def __init__(self, value: V) -> None:
-        self.validate_value(value)
-        self.value = value
-
-    @classmethod
-    def validate_value(cls, value: V) -> None:
+    def _validate(self) -> None:
         """This method checks that a value is valid to create this value object"""
         pass
 
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-        return self.value == other.value
 
-    def __hash__(self) -> int:
-        return hash(self.value)
+@dataclass(frozen=True)
+class ValueObject(BaseValueObject, ABC, Generic[V]):
+    value: V
 
     def __str__(self) -> str:
-        return self.value
+        return str(self.value)
+
+    def __int__(self) -> int:
+        return int(self.value)
