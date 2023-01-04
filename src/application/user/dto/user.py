@@ -1,15 +1,15 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 from src.application.base.dto import DTO
-from src.domain.user.value_objects import UserId, Username
 
 
 @dataclass(frozen=True)
 class User(DTO):
-    id: UserId
+    id: UUID
     first_name: str
     last_name: str | None
-    username: Username
+    username: str
 
     @property
     def full_name(self) -> str:

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 from didiator import EventMediator
 
@@ -13,10 +14,10 @@ from src.domain.user.value_objects import UserId, Username
 
 @dataclass(frozen=True)
 class CreateUser(Command[dto.User]):
-    user_id: UserId
+    user_id: UUID
     first_name: str
     last_name: str
-    username: Username
+    username: str
 
 
 class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
@@ -27,7 +28,12 @@ class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
         self._mediator = mediator
 
     async def __call__(self, command: CreateUser) -> dto.User:
-        user = User.create(command.user_id, command.first_name, command.last_name, command.username)
+        user = User.create(
+            UserId(command.user_id),
+            command.first_name,
+            command.last_name,
+            Username(command.username),
+        )
         await self._user_repo.add_user(user)
         await self._mediator.publish(user.pull_events())
         await self._uow.commit()
