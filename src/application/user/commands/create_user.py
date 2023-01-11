@@ -15,9 +15,9 @@ from src.domain.user.value_objects import UserId, Username
 @dataclass(frozen=True)
 class CreateUser(Command[dto.User]):
     user_id: UUID
-    first_name: str
-    last_name: str
     username: str
+    first_name: str
+    last_name: str | None
 
 
 class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
@@ -30,9 +30,9 @@ class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
     async def __call__(self, command: CreateUser) -> dto.User:
         user = User.create(
             UserId(command.user_id),
+            Username(command.username),
             command.first_name,
             command.last_name,
-            Username(command.username),
         )
         await self._user_repo.add_user(user)
         await self._mediator.publish(user.pull_events())

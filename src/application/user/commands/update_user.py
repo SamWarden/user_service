@@ -14,9 +14,9 @@ from src.domain.user.value_objects import UserId, Username
 
 @dataclass(frozen=True)
 class UpdateUserData:
+    username: str = UNSET
     first_name: str = UNSET
     last_name: str = UNSET
-    username: str = UNSET
 
 
 @dataclass(frozen=True)
@@ -34,10 +34,11 @@ class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
 
     async def __call__(self, command: UpdateUser) -> dto.User:
         user = await self._user_repo.get_user_by_id(UserId(command.user_id))
+        username = Username(command.user_data.username) if command.user_data.username is not UNSET else UNSET
         user.update(
+            username,
             command.user_data.first_name,
             command.user_data.last_name,
-            Username(command.user_data.username),
         )
         await self._user_repo.update_user(user)
         await self._mediator.publish(user.pull_events())

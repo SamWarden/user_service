@@ -7,9 +7,9 @@ from src.application.base.dto import DTO
 @dataclass(frozen=True)
 class User(DTO):
     id: UUID
+    username: str
     first_name: str
     last_name: str | None
-    username: str
 
     @property
     def full_name(self) -> str:
