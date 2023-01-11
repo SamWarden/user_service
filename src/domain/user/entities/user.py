@@ -13,15 +13,15 @@ from src.domain.user.value_objects.username import Username
 @dataclasses.dataclass
 class User(AggregateRoot):
     id: UserId
+    username: Username
     first_name: str
     last_name: str | None
-    username: Username
     deleted: bool = dataclasses.field(init=False, default=False)
 
     @classmethod
-    def create(cls, user_id: UserId, first_name: str, last_name: str | None, username: Username) -> Self:
-        user = User(user_id, first_name, last_name, username)
-        user.record_event(UserCreated(user_id, first_name, last_name, username))
+    def create(cls, user_id: UserId, username: Username, first_name: str, last_name: str | None) -> Self:
+        user = User(user_id, username, first_name, last_name)
+        user.record_event(UserCreated(user_id, username, first_name, last_name))
         return user
 
     @property
@@ -32,17 +32,17 @@ class User(AggregateRoot):
 
     def update(
         self,
+        username: Username = UNSET,
         first_name: str = UNSET,
         last_name: str | None = UNSET,
-        username: Username = UNSET,
     ) -> None:
+        if username is not UNSET:
+            self.username = username
         if first_name is not UNSET:
             self.first_name = first_name
         if last_name is not UNSET:
             self.last_name = last_name
-        if username is not UNSET:
-            self.username = username
-        self.record_event(UserUpdated(self.id, self.first_name, self.last_name, self.username))
+        self.record_event(UserUpdated(self.id, self.username, self.first_name, self.last_name))
 
     def delete(self) -> None:
         self.deleted = True

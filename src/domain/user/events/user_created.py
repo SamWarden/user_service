@@ -8,6 +8,6 @@ from src.domain.user.value_objects.username import Username
 @dataclasses.dataclass(frozen=True)
 class UserCreated(Event):  # noqa
     user_id: UserId
+    username: Username
     first_name: str
     last_name: str | None
-    username: Username
