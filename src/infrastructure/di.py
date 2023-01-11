@@ -6,8 +6,10 @@ from di.executors import AsyncExecutor
 from didiator import CommandMediator, EventMediator, Mediator, QueryMediator
 from didiator.utils.di_builder import DiBuilder
 
+from src.application.base.interfaces.mapper import Mapper
 from src.infrastructure.constants import APP_SCOPE, REQUEST_SCOPE
 from src.infrastructure.factories.mediator import build_mediator
+from src.infrastructure.mapper.main import build_mapper
 
 
 def setup_mediator_factory(
@@ -28,6 +30,7 @@ def setup_di_builder() -> DiBuilder:
     di_builder = DiBuilder(di_container, di_executor, di_scopes=di_scopes)
 
     di_builder.bind(bind_by_type(Dependent(lambda *args: di_builder, scope=APP_SCOPE), DiBuilder))
+    di_builder.bind(bind_by_type(Dependent(build_mapper, scope=APP_SCOPE), Mapper))
     setup_mediator_factory(di_builder, build_mediator, APP_SCOPE)
 
     # di_builder.bind(bind_by_type(Dependent(build_config, scope=APP_SCOPE), Config))
