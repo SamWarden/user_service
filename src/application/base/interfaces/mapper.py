@@ -4,5 +4,5 @@ T = TypeVar("T")
 
 
 class Mapper(Protocol):
-    def convert(self, data: Any, class_: Type[T]) -> T:
+    def load(self, data: Any, class_: Type[T]) -> T:
         raise NotImplementedError
