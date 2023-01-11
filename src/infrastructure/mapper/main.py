@@ -14,7 +14,7 @@ class MapperImpl(Mapper):
     def __init__(self, retort: Retort) -> None:
         self._retort = retort
 
-    def convert(self, data: Any, class_: Type[T]) -> T:
+    def load(self, data: Any, class_: Type[T]) -> T:
         return self._retort.load(data, class_)
 
 
