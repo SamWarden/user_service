@@ -1,8 +1,9 @@
 import tomllib
 from dataclasses import dataclass
 
-from dataclass_factory import Factory
+from dataclass_factory import Retort
 
+from src.infrastructure.db import DBConfig
 from src.infrastructure.log import LoggingConfig
 
 
@@ -13,12 +14,13 @@ def read_toml(path: str) -> dict:
 
 @dataclass
 class Config:
+    db: DBConfig
     logging: LoggingConfig
 
 
 def load_config(path: str) -> Config:
     data = read_toml(path)
 
-    dcf = Factory()
+    dcf = Retort()
     config = dcf.load(data, Config)
     return config
