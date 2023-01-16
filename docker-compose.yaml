@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: user_service_postgres
+    image: "postgres:15-alpine"
+    restart: unless-stopped
+    expose:
+      - "5432:5432"
+    ports:
+      - "127.0.0.1:15432:5432"
+    networks:
+      - postgres
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_USER: ${POSTGRES_USER:-$USER}
+      POSTGRES_DB: ${POSTGRES_DB:-$USER}
+    volumes:
+      - "user-service-postgres-data:/var/lib/postgresql/data:rw"
+
+  postgres_migration:
+    build:
+      context: .
+    restart: "on-failure"
+    depends_on:
+      - postgres
+    env_file: .env
+    networks:
+      - postgres
+    volumes:
+      - "./config.toml:/app/config.toml"
+      - "./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations"
+    command: ["/wait-for-it/wait-for-it.sh", "postgres:5432", "-t", "15", "--", "python", "-m", "alembic", "upgrade", "head"]
+
+volumes:
+  user-service-postgres-data:
+
+networks:
+  postgres:
+  reverse-proxy:
+    external:
+      name: nginx-reverse-proxy
