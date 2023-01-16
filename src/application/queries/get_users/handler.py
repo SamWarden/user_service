@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
-from src.application.base.query import Query, QueryHandler
-from src.application.user import dto
-from src.application.user.interfaces.persistence import UserReader
+from src.application.queries.common.query import Query, QueryHandler
+from src.application.common.user import dto
+
+from .interfaces import UserReader
 
 
 @dataclass(frozen=True)
