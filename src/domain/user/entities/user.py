@@ -6,6 +6,7 @@ from src.domain.base.constants import UNSET
 from src.domain.user.events.user_created import UserCreated
 from src.domain.user.events.user_deleted import UserDeleted
 from src.domain.user.events.user_updated import UserUpdated
+from src.domain.user.exceptions import UserAlreadyDeleted
 from src.domain.user.value_objects.user_id import UserId
 from src.domain.user.value_objects.username import Username
 
@@ -13,7 +14,7 @@ from src.domain.user.value_objects.username import Username
 @dataclasses.dataclass
 class User(AggregateRoot):
     id: UserId
-    username: Username
+    username: Username | None
     first_name: str
     last_name: str | None
     deleted: bool = dataclasses.field(init=False, default=False)
@@ -45,5 +46,9 @@ class User(AggregateRoot):
         self.record_event(UserUpdated(self.id, self.username, self.first_name, self.last_name))
 
     def delete(self) -> None:
+        if self.deleted:
+            raise UserAlreadyDeleted
+
+        self.username = None
         self.deleted = True
         self.record_event(UserDeleted(self.id))
