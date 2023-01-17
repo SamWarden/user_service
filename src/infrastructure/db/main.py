@@ -17,11 +17,11 @@ async def build_sa_engine(db_config: DBConfig) -> AsyncGenerator[AsyncEngine, No
     await engine.dispose()
 
 
-def build_sa_pool(engine: AsyncEngine) -> sessionmaker:
+def build_sa_session_factory(engine: AsyncEngine) -> sessionmaker:
     session_factory = sessionmaker(bind=engine, class_=AsyncSession, autoflush=False, expire_on_commit=False)
     return session_factory
 
 
-async def build_sa_session(pool: sessionmaker) -> AsyncGenerator[AsyncSession, None]:
-    async with pool() as session:
+async def build_sa_session(session_factory: sessionmaker) -> AsyncGenerator[AsyncSession, None]:
+    async with session_factory() as session:
         yield session
