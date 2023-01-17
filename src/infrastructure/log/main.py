@@ -1,101 +1,79 @@
 import logging.config
-import os
-from typing import Any
 
 import structlog
 from sqlalchemy import log as sa_log
+from structlog.processors import CallsiteParameter, CallsiteParameterAdder
 
 from .config import LoggingConfig
-from .processors import CallsiteParameter, CallsiteParameterAdder, RenderProcessorFactory
+from .processors import get_render_processor
 
 
-def configure_logging(cfg: LoggingConfig) -> dict[str, Any]:
+def configure_logging(cfg: LoggingConfig) -> None:
     # Mute SQLAlchemy default logger handler
     sa_log._add_default_handler = lambda _: None  # type: ignore
 
-    render_processor = RenderProcessorFactory(cfg.render_json_logs).get_processor()
-    time_stamper = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S.%f", utc=True)
-    pre_chain = [
+    common_processors = (
         structlog.stdlib.add_log_level,
+        structlog.stdlib.add_logger_name,
         structlog.stdlib.ExtraAdder(),
-        time_stamper,
-    ]
+        structlog.dev.set_exc_info,
+        structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S.%f", utc=True),
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.dict_tracebacks,
+        CallsiteParameterAdder((
+            CallsiteParameter.FUNC_NAME,
+            CallsiteParameter.LINENO,
+        )),
+    )
+    structlog_processors = (
+        structlog.processors.StackInfoRenderer(),
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.UnicodeDecoder(),  # convert bytes to str
+        # structlog.stdlib.render_to_log_kwargs,
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        # structlog.processors.format_exc_info,  # print exceptions from event dict
+    )
+    logging_processors = (
+        structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+    )
+    logging_console_processors = (
+        *logging_processors,
+        get_render_processor(render_json_logs=cfg.render_json_logs, colors=True),
+    )
+    logging_file_processors = (
+        *logging_processors,
+        get_render_processor(render_json_logs=cfg.render_json_logs, colors=False),
+    )
+
+    handler = logging.StreamHandler()
+    handler.set_name("default")
+    handler.setLevel(cfg.level)
+    console_formatter = structlog.stdlib.ProcessorFormatter(
+        foreign_pre_chain=common_processors,  # type: ignore
+        processors=logging_console_processors,
+    )
+    handler.setFormatter(console_formatter)
+
+    handlers = [handler]
     if cfg.path:
         cfg.path.parent.mkdir(parents=True, exist_ok=True)
         log_path = cfg.path / "logs.log" if cfg.path.is_dir() else cfg.path
-    else:
-        log_path = None
 
-    print(log_path)
-    config = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "colored": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processors": [
-                    # TODO: add processor that will add extra fields to a record
-                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                    render_processor,
-                ],
-                "foreign_pre_chain": pre_chain,
-            },
-            "default": {
-                "format": '%(asctime)s %(levelname)-8s %(name)-15s %(message)s',
-                "datefmt": '%Y-%m-%d %H:%M:%S',
-            },
-        },
-        "handlers": {
-            "default": {
-                "level": cfg.level,
-                "class": "logging.StreamHandler",
-                "formatter": "colored",
-            },
-            "file": {
-                "level": cfg.level,
-                "class": "logging.FileHandler",
-                "filename": log_path if log_path else os.devnull,
-                "formatter": "default",
-            },
-        },
-        "loggers": {
-            "": {
-                "handlers": ["default", "file"],
-                "level": cfg.level,
-                "propagate": True,
-            },
-            "gunicorn.access": {"handlers": ["default"]},
-            "gunicorn.error": {"handlers": ["default"]},
-            "uvicorn.access": {"handlers": ["default"]},
-        },
-        "root": {
-            "level": cfg.level,
-            "handlers": ["default", 'file'],
-        },
-    }
+        file_handler = logging.FileHandler(log_path)
+        file_handler.set_name("file")
+        file_handler.setLevel(cfg.level)
+        file_formatter = structlog.stdlib.ProcessorFormatter(
+            foreign_pre_chain=common_processors,  # type: ignore
+            processors=logging_file_processors,
+        )
+        file_handler.setFormatter(file_formatter)
+        handlers.append(file_handler)
 
-    logging.config.dictConfig(config)
+    logging.basicConfig(handlers=handlers, level=cfg.level)
     structlog.configure(
-        processors=[
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.add_logger_name,
-            CallsiteParameterAdder((
-                CallsiteParameter.RELPATH,
-                CallsiteParameter.FUNC_NAME,
-                CallsiteParameter.LINENO,
-            )),
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            time_stamper,
-            structlog.processors.StackInfoRenderer(),
-            # structlog.processors.format_exc_info,  # print exceptions from event dict
-            # structlog.processors.UnicodeDecoder(),  # convert bytes to str
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-            # structlog.stdlib.render_to_log_kwargs,
-        ],
+        processors=common_processors + structlog_processors,
         logger_factory=structlog.stdlib.LoggerFactory(),
         # wrapper_class=structlog.stdlib.AsyncBoundLoggerd,  # type: ignore  # noqa
         wrapper_class=structlog.stdlib.BoundLogger,  # type: ignore  # noqa
         cache_logger_on_first_use=True,
     )
-    return config
