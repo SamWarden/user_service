@@ -3,11 +3,11 @@ from uuid import UUID
 
 from didiator import EventMediator
 
-from src.application.base.command import Command, CommandHandler
-from src.application.base.interfaces.mapper import Mapper
-from src.application.base.interfaces.uow import UnitOfWork
+from src.application.commands.common.command import Command, CommandHandler
+from src.application.common.base.interfaces.mapper import Mapper
+from src.application.common.base.interfaces.uow import UnitOfWork
 from src.application.user import dto
-from src.application.user.interfaces.persistence import UserRepo
+from src.application.queries.common.interfaces.persistence import UserRepo
 from src.domain.user.entities import User
 from src.domain.user.value_objects import UserId, Username
 

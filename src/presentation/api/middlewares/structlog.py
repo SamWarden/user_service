@@ -8,8 +8,5 @@ async def structlog_bind_middleware(
     request: Request,
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
-    structlog.contextvars.bind_contextvars(request_id=str(request.state.request_id))
-    try:
+    with structlog.contextvars.bound_contextvars(request_id=str(request.state.request_id)):
         return await call_next(request)
-    finally:
-        structlog.contextvars.unbind_contextvars("request_id")
