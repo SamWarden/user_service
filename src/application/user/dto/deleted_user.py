@@ -6,12 +6,11 @@ from src.application.common.dto import DTO
 
 
 @dataclass(frozen=True)
-class User(DTO):
+class DeletedUser(DTO):
     id: UUID
-    username: str
     first_name: str
     last_name: str | None
-    deleted: Literal[False] = field(default=False, init=False)
+    deleted: Literal[True] = field(default=True, init=False)
 
     @property
     def full_name(self) -> str:

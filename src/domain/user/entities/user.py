@@ -17,7 +17,7 @@ class User(AggregateRoot):
     username: Username | None
     first_name: str
     last_name: str | None
-    deleted: bool = dataclasses.field(init=False, default=False)
+    deleted: bool = dataclasses.field(default=False, kw_only=True)
 
     @classmethod
     def create(cls, user_id: UserId, username: Username, first_name: str, last_name: str | None) -> Self:

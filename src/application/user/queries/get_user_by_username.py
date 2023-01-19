@@ -6,7 +6,6 @@ from src.application.user.interfaces import UserReader
 from src.domain.user.value_objects import Username
 
 
-
 @dataclass(frozen=True)
 class GetUserByUsername(Query[dto.User]):
     username: Username
