@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from src.application.common.user import dto
-from src.application.queries.common.query import Query, QueryHandler
+from src.application.common.query import Query, QueryHandler
+from src.application.user import dto
+from src.application.user.interfaces import UserReader
 from src.domain.user.value_objects import Username
 
-from .interfaces import UserReader
 
 
 @dataclass(frozen=True)

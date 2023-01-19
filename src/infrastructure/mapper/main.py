@@ -1,8 +1,8 @@
 from typing import Any, Type, TypeVar
 
-from dataclass_factory import Retort
+from dataclass_factory import Retort, loader
 
-from src.application.base.interfaces.mapper import Mapper
+from src.application.common.interfaces.mapper import Mapper
 from src.application import user
 
 from .user import convert_user_entity_to_dto
@@ -20,5 +20,5 @@ class MapperImpl(Mapper):
 
 def build_mapper() -> MapperImpl:
     return MapperImpl(Retort(recipe=(
-        user.dto.User, convert_user_entity_to_dto,
+        loader(user.dto.User, convert_user_entity_to_dto),
     )))

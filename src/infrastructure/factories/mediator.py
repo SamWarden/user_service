@@ -8,9 +8,9 @@ from didiator.middlewares.di import DiMiddleware
 from didiator.middlewares.logging import LoggingMiddleware
 from didiator.utils.di_builder import DiBuilder
 
-from src.application.user.commands.create_user import CreateUser, CreateUserHandler
-from src.application.user.commands.delete_user import DeleteUser, DeleteUserHandler
-from src.application.user.commands.update_user import UpdateUser, UpdateUserHandler
+from src.application.user.commands import CreateUser, CreateUserHandler
+from src.application.user.commands import DeleteUser, DeleteUserHandler
+from src.application.user.commands import UpdateUser, UpdateUserHandler
 from src.application.user.queries.get_user_by_id import GetUserById, GetUserByIdHandler
 from src.application.user.queries.get_user_by_username import GetUserByUsername, GetUserByUsernameHandler
 from src.application.user.queries.get_users import GetUsers, GetUsersHandler

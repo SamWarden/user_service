@@ -3,14 +3,15 @@ import datetime
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from src.application.common.user import dto
+from src.application.user import dto
+from src.application.user.interfaces.persistence import UserReader, UserRepo
 from src.domain.user import entities
 from src.domain.user.value_objects import UserId, Username
 from src.infrastructure.db.models.user import User
 from src.infrastructure.db.repositories.base import SQLAlchemyRepo
 
 
-class UserReaderImpl(SQLAlchemyRepo):
+class UserReaderImpl(SQLAlchemyRepo, UserReader):
     async def get_user_by_id(self, user_id: UserId) -> dto.User:
         user = await self._session.scalar(select(User).where(
             User.id == user_id.to_uuid(),
@@ -39,7 +40,7 @@ class UserReaderImpl(SQLAlchemyRepo):
         return self._mapper.load(users, tuple[dto.User, ...])
 
 
-class UserRepoImpl(SQLAlchemyRepo):
+class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     async def get_user_by_id(self, user_id: UserId) -> entities.User:
         user = await self._session.scalar(select(User).where(
             User.id == user_id.to_uuid(),
