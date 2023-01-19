@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.application.common.base.interfaces.mapper import Mapper
+from src.application.common.interfaces.mapper import Mapper
 
 
 class SQLAlchemyRepo:

@@ -8,16 +8,15 @@ from didiator.utils.di_builder import DiBuilder
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-from src.application.commands.common.interfaces.persistence import UserRepo
-from src.application.common.base.interfaces.mapper import Mapper
-from src.application.common.base.interfaces.uow import UnitOfWork
-from src.application.queries.common.interfaces.persistence import UserReader
+from src.application.common.interfaces.mapper import Mapper
+from src.application.common.interfaces.uow import UnitOfWork
+from src.application.user.interfaces.persistence import UserReader, UserRepo
 from src.infrastructure.constants import APP_SCOPE, REQUEST_SCOPE
 from src.infrastructure.db.main import build_sa_engine, build_sa_session, build_sa_session_factory
 from src.infrastructure.db.repositories.user import UserReaderImpl, UserRepoImpl
 from src.infrastructure.db.uow import SQLAlchemyUoW
 from src.infrastructure.factories.mediator import build_mediator
-from src.infrastructure.mapper.main import build_mapper, MapperImpl
+from src.infrastructure.mapper.main import build_mapper
 
 
 def setup_mediator_factory(
