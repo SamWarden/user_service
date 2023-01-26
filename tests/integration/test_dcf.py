@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 import pytest
 from dataclass_factory import Retort, loader
@@ -34,10 +35,20 @@ class OrderDTO(DTO):
     owner_id: int
 
 
-DTOs = OrderDTO | UserDTO
+@dataclass
+class OrderOwner(User):
+    orders: list[Order]
 
 
-def convert_user_entity_to_dto(user: User) -> UserDTO:
+@dataclass
+class OrderOwnerDTO(UserDTO):
+    orders: list[OrderDTO]
+
+
+DTOs = OrderDTO | UserDTO | OrderOwnerDTO
+
+
+def convert_user_entity_to_dto(user: User | object) -> UserDTO:
     if not isinstance(user, User):
         raise ValueLoadError(f"Wrong type, user is not User: {type(user)}")
 
@@ -54,6 +65,20 @@ def convert_order_entity_to_dto(order: Order) -> OrderDTO:
     return OrderDTO(
         order_id=order.id,
         owner_id=order.owner_id,
+    )
+
+
+def convert_order_owner_entity_to_dto(order_owner: OrderOwner) -> OrderOwnerDTO:
+    if not isinstance(order_owner, OrderOwner):
+        raise ValueLoadError(f"Wrong type: {type(order_owner)}")
+
+    return OrderOwnerDTO(
+        user_id=str(order_owner.id),
+        username=order_owner.username,
+        orders=[
+            OrderDTO(order_id=order.id, owner_id=order.owner_id)
+            for order in order_owner.orders
+        ],
     )
 
 
@@ -106,3 +131,16 @@ def test_convert_sequence_entities_to_tuple_dtos():
     assert retort.load((User(1, "Jon"), Order(1, 100)), tuple[UserDTO, OrderDTO]) == (UserDTO("1", "Jon"), OrderDTO(1, 100))
     assert retort.load((User(1, "Jon"), Order(1, 100)), tuple[DTOs, DTOs]) == (UserDTO("1", "Jon"), OrderDTO(1, 100))
     assert retort.load((User(1, "Jon"), Order(1, 100)), tuple[DTOs, ...]) == (UserDTO("1", "Jon"), OrderDTO(1, 100))
+
+
+def test_convert_order_owner_entity_to_dto():
+    retort = Retort(recipe=(
+        loader(UserDTO, convert_user_entity_to_dto),
+        loader(OrderDTO, convert_order_entity_to_dto),
+        loader(OrderOwnerDTO, convert_order_owner_entity_to_dto),
+    ))
+
+    assert retort.load(
+        OrderOwner(1, "Jon", [Order(1, 100), Order(2, 200)]),
+        OrderOwnerDTO,
+    ) == OrderOwnerDTO("1", "Jon", [OrderDTO(1, 100), OrderDTO(2, 200)])
