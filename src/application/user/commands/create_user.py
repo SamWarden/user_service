@@ -37,5 +37,6 @@ class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
         await self._user_repo.add_user(user)
         await self._mediator.publish(user.pull_events())
         await self._uow.commit()
+
         user_dto = self._mapper.load(user, dto.User)
         return user_dto

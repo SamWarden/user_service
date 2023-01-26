@@ -1,0 +1,22 @@
+from collections.abc import Callable
+from functools import wraps
+from typing import ParamSpec, TypeVar
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from src.application.common.exceptions import RepoError
+
+Param = ParamSpec("Param")
+ReturnType = TypeVar("ReturnType")
+Func = Callable[Param, ReturnType]
+
+
+def exception_mapper(func: Func) -> Func:
+    @wraps(func)
+    async def wrapped(*args: Param.args, **kwargs: Param.kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except SQLAlchemyError as err:
+            raise RepoError from err
+
+    return wrapped

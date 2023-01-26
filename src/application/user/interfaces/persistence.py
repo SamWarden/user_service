@@ -6,7 +6,7 @@ from src.domain.user.value_objects import UserId, Username
 
 
 class UserRepo(Protocol):
-    async def get_user_by_id(self, user_id: UserId) -> entities.User:
+    async def acquire_user_by_id(self, user_id: UserId) -> entities.User:
         raise NotImplementedError
 
     async def add_user(self, user: entities.User) -> None:
@@ -20,7 +20,7 @@ class UserReader(Protocol):
     async def get_user_by_id(self, user_id: UserId) -> dto.UserDTOs:
         raise NotImplementedError
 
-    async def get_user_by_username(self, username: Username) -> dto.UserDTOs:
+    async def get_user_by_username(self, username: Username) -> dto.User:
         raise NotImplementedError
 
     async def get_users(self) -> tuple[dto.UserDTOs, ...]:
