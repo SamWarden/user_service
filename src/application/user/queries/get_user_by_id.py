@@ -7,14 +7,14 @@ from src.domain.user.value_objects import UserId
 
 
 @dataclass(frozen=True)
-class GetUserById(Query[dto.User]):
+class GetUserById(Query[dto.UserDTOs]):
     user_id: UserId
 
 
-class GetUserByIdHandler(QueryHandler[GetUserById, dto.User]):
+class GetUserByIdHandler(QueryHandler[GetUserById, dto.UserDTOs]):
     def __init__(self, user_reader: UserReader) -> None:
         self._user_reader = user_reader
 
-    async def __call__(self, query: GetUserById) -> dto.User:
+    async def __call__(self, query: GetUserById) -> dto.UserDTOs:
         user = await self._user_reader.get_user_by_id(query.user_id)
         return user

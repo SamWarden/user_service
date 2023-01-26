@@ -33,7 +33,7 @@ class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
         self._mediator = mediator
 
     async def __call__(self, command: UpdateUser) -> dto.User:
-        user = await self._user_repo.get_user_by_id(UserId(command.user_id))
+        user = await self._user_repo.acquire_user_by_id(UserId(command.user_id))
         username = Username(command.user_data.username) if command.user_data.username is not UNSET else UNSET
         user.update(
             username,
@@ -43,5 +43,6 @@ class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
         await self._user_repo.update_user(user)
         await self._mediator.publish(user.pull_events())
         await self._uow.commit()
+
         user_dto = self._mapper.load(user, dto.User)
         return user_dto
