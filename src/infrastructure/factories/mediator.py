@@ -1,7 +1,6 @@
 import logging
 from collections.abc import Callable
 
-import structlog
 from di.container import ContainerState
 from didiator import CommandDispatcherImpl, EventObserverImpl, Mediator, MediatorImpl, QueryDispatcherImpl
 from didiator.middlewares.di import DiMiddleware
@@ -19,7 +18,7 @@ from src.infrastructure.constants import REQUEST_SCOPE
 
 def build_mediator(di_builder: DiBuilder) -> Mediator:
     middlewares = (
-        LoggingMiddleware(structlog.get_logger("mediator"), level=logging.DEBUG),
+        LoggingMiddleware("mediator", level=logging.DEBUG),
         DiMiddleware(di_builder, cls_scope=REQUEST_SCOPE),
     )
     command_dispatcher = CommandDispatcherImpl(middlewares=middlewares)

@@ -84,3 +84,25 @@ def test_convert_entity_to_unknown_dto():
     assert retort.load(Order(1, 100), OrderDTO) == OrderDTO(1, 100)
     assert retort.load(User(1, "Jon"), DTOs) == UserDTO("1", "Jon")
     assert retort.load(Order(1, 100), DTOs) == OrderDTO(1, 100)
+
+
+def test_convert_sequence_entities_to_list_dtos():
+    retort = Retort(recipe=(
+        loader(UserDTO, convert_user_entity_to_dto),
+        loader(OrderDTO, convert_order_entity_to_dto),
+    ))
+
+    assert retort.load([User(1, "Jon"), Order(1, 100)], list[DTOs]) == [UserDTO("1", "Jon"), OrderDTO(1, 100)]
+    assert retort.load((User(1, "Jon"), Order(1, 100)), list[DTOs]) == [UserDTO("1", "Jon"), OrderDTO(1, 100)]
+
+
+@pytest.mark.skip("Convert to tuple of dataclasses not working now")
+def test_convert_sequence_entities_to_tuple_dtos():
+    retort = Retort(recipe=(
+        loader(UserDTO, convert_user_entity_to_dto),
+        loader(OrderDTO, convert_order_entity_to_dto),
+    ))
+
+    assert retort.load((User(1, "Jon"), Order(1, 100)), tuple[UserDTO, OrderDTO]) == (UserDTO("1", "Jon"), OrderDTO(1, 100))
+    assert retort.load((User(1, "Jon"), Order(1, 100)), tuple[DTOs, DTOs]) == (UserDTO("1", "Jon"), OrderDTO(1, 100))
+    assert retort.load((User(1, "Jon"), Order(1, 100)), tuple[DTOs, ...]) == (UserDTO("1", "Jon"), OrderDTO(1, 100))

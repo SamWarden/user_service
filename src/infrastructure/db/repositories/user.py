@@ -12,39 +12,37 @@ from src.infrastructure.db.repositories.base import SQLAlchemyRepo
 
 
 class UserReaderImpl(SQLAlchemyRepo, UserReader):
-    async def get_user_by_id(self, user_id: UserId) -> dto.User:
+    async def get_user_by_id(self, user_id: UserId) -> dto.UserDTOs:
         user = await self._session.scalar(select(User).where(
             User.id == user_id.to_uuid(),
-            User.deleted_at.is_(None),
         ))
         if user is None:
             # TODO: add custom error
             raise ValueError
 
-        return self._mapper.load(user, dto.User)
+        return self._mapper.load(user, dto.UserDTOs)
 
-    async def get_user_by_username(self, username: Username) -> dto.User:
+    async def get_user_by_username(self, username: Username) -> dto.UserDTOs:
         user = await self._session.scalar(select(User).where(
             User.username == str(username),
-            User.deleted_at.is_(None),
         ))
         if user is None:
             # TODO: add custom error
             raise ValueError
 
-        return self._mapper.load(user, dto.User)
+        return self._mapper.load(user, dto.UserDTOs)
 
-    async def get_users(self) -> tuple[dto.User, ...]:
-        result = await self._session.scalars(select(User).where(User.deleted_at.is_(None)))
+    async def get_users(self) -> tuple[dto.UserDTOs, ...]:
+        result = await self._session.scalars(select(User))
         users = result.all()
-        return self._mapper.load(users, tuple[dto.User, ...])
+        return tuple(self._mapper.load(users, list[dto.UserDTOs]))
+        # return self._mapper.load(users, tuple[dto.UserDTOs, ...])
 
 
 class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     async def get_user_by_id(self, user_id: UserId) -> entities.User:
         user = await self._session.scalar(select(User).where(
             User.id == user_id.to_uuid(),
-            User.deleted_at.is_(None),
         ))
         if user is None:
             # TODO: add custom error
@@ -55,14 +53,12 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     async def is_username_exist(self, username: Username) -> bool:
         user = await self._session.scalar(select(User).where(
             User.username == str(username),
-            User.deleted_at.is_(None),
         ))
         return user is not None
 
     async def get_user_by_username(self, username: Username) -> entities.User:
         user = await self._session.scalar(select(User).where(
             User.username == str(username),
-            User.deleted_at.is_(None),
         ))
         if user is None:
             # TODO: add custom error
@@ -83,8 +79,8 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
         self._session.add(db_user)
         await self._session.flush((db_user,))
 
-    async def delete_user(self, user: entities.User) -> None:
-        db_user = self._mapper.load(user, User)
-        db_user.deleted_at = datetime.datetime.now()
-        self._session.add(db_user)
-        await self._session.flush((db_user,))
+    # async def delete_user(self, user: entities.User) -> None:
+    #     db_user = self._mapper.load(user, User)
+    #     db_user.deleted_at = datetime.datetime.now()
+    #     self._session.add(db_user)
+    #     await self._session.flush((db_user,))

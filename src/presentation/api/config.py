@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from di.container import bind_by_type
 from di.dependent import Dependent
@@ -11,15 +11,15 @@ from src.infrastructure.log import LoggingConfig
 
 @dataclass
 class APIConfig:
-    host: str = "localhost"
+    host: str = "127.0.0.1"
     port: int = 5000
 
 
 @dataclass
 class Config:
-    db: DBConfig
-    logging: LoggingConfig
-    api: APIConfig
+    db: DBConfig = field(default_factory=DBConfig)
+    logging: LoggingConfig = field(default_factory=LoggingConfig)
+    api: APIConfig = field(default_factory=APIConfig)
 
 
 def setup_di_builder_config(di_builder: DiBuilder, config: Config) -> None:
