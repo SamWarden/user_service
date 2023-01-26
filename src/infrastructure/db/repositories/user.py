@@ -4,7 +4,7 @@ from asyncpg import UniqueViolationError
 from sqlalchemy import select
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
-from src.application.common.exceptions import UnexpectedError
+from src.application.common.exceptions import RepoError, UnexpectedError
 from src.application.user import dto
 from src.application.user.exceptions import UserIdAlreadyExist, UserIdNotExist, UsernameAlreadyExist, UsernameNotExist
 from src.application.user.interfaces.persistence import UserReader, UserRepo
@@ -82,4 +82,4 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
             case "uq_users_username":
                 raise UsernameAlreadyExist(user.username) from err
             case _:
-                raise UnexpectedError from err
+                raise RepoError from err
