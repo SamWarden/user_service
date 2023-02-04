@@ -2,7 +2,7 @@ import logging
 
 import structlog
 import uvicorn
-from di.container import ContainerState
+from di import ScopeState
 from didiator import Mediator
 from didiator.utils.di_builder import DiBuilder
 from fastapi import FastAPI
@@ -19,7 +19,7 @@ logger = structlog.get_logger()
 def init_api(
     mediator: Mediator,
     di_builder: DiBuilder,
-    di_state: ContainerState | None = None,
+    di_state: ScopeState | None = None,
 ) -> FastAPI:
     logger.debug("Initialize API")
     app = FastAPI()
