@@ -18,10 +18,11 @@ python = "^3.11"
 sqlalchemy = "^2.0.0rc2"
 structlog = "^22.3.0"
 fastapi = "^0.89.1"
-didiator = {version = "^0.2.0", extras = ["di"]}
+didiator = {version = "0.3.1", extras = ["di"]}
+# TODO: use uuid6-python instead
 uuid7 = "^0.1.0"
 orjson = "^3.8.3"
-dataclass-factory = {git = "https://github.com/Tishka17/dataclass_factory.git", rev = "925db96970b651a926acfd95b79d34b3b182ec1b"}
+dataclass-factory = {git = "https://github.com/reagento/dataclass-factory", rev = "688efa01cb08f3ea574e9e68661786339f61f10e"}
 alembic = "^1.9.1"
 rich = "^13.0.0"
 asyncpg = "^0.27.0"
