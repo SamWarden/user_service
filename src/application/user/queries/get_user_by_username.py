@@ -8,7 +8,7 @@ from src.domain.user.value_objects import Username
 
 @dataclass(frozen=True)
 class GetUserByUsername(Query[dto.User]):
-    username: Username
+    username: str
 
 
 class GetUserByUsernameHandler(QueryHandler[GetUserByUsername, dto.User]):
@@ -16,5 +16,5 @@ class GetUserByUsernameHandler(QueryHandler[GetUserByUsername, dto.User]):
         self._user_reader = user_reader
 
     async def __call__(self, query: GetUserByUsername) -> dto.User:
-        user = await self._user_reader.get_user_by_username(query.username)
+        user = await self._user_reader.get_user_by_username(Username(query.username))
         return user
