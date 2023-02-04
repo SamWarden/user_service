@@ -2,7 +2,7 @@ from collections.abc import Awaitable, Callable
 
 from fastapi import Request
 from fastapi import Response
-from uuid_extensions import uuid7
+from uuid6 import uuid7
 
 
 async def set_request_id_middleware(

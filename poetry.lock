@@ -1117,15 +1117,15 @@ files = [
 ]
 
 [[package]]
-name = "uuid7"
-version = "0.1.0"
-description = "UUID version 7, generating time-sorted UUIDs with 200ns time resolution and 48 bits of randomness"
+name = "uuid6"
+version = "2022.10.25"
+description = "New time-based UUID formats which are suited for use as a database key"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "uuid7-0.1.0-py2.py3-none-any.whl", hash = "sha256:5e259bb63c8cb4aded5927ff41b444a80d0c7124e8a0ced7cf44efa1f5cccf61"},
-    {file = "uuid7-0.1.0.tar.gz", hash = "sha256:8c57aa32ee7456d3cc68c95c4530bc571646defac01895cfc73545449894a63c"},
+    {file = "uuid6-2022.10.25-py3-none-any.whl", hash = "sha256:bd9b874081968c5f24af7ec7a3f48175197806224cc6f4833914f671854c6266"},
+    {file = "uuid6-2022.10.25.tar.gz", hash = "sha256:0a56935de9c1ce8dd8559225b845549d94917d9e24ad4b1cc2328eea5be0010c"},
 ]
 
 [[package]]
@@ -1224,4 +1224,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "30e753616bafd8339140d0198435c908262bee94ca940e9ac24514d7615ad564"
+content-hash = "27e4755711c2e7e3f0752237d1b83d22b1283ed99c84fe4a2b743e383e734faf"
