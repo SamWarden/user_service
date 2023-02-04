@@ -1,6 +1,6 @@
-from di.container import ContainerState
+from di import ScopeState
 from didiator import CommandMediator, EventMediator, Mediator, QueryMediator
-from didiator.utils.di_builder import DiBuilder
+from didiator.interface.utils.di_builder import DiBuilder
 from fastapi import FastAPI
 
 from .di import get_di_builder, get_di_state, StateProvider
@@ -12,7 +12,7 @@ def setup_providers(
     app: FastAPI,
     mediator: Mediator,
     di_builder: DiBuilder,
-    di_state: ContainerState | None = None,
+    di_state: ScopeState | None = None,
 ) -> None:
     mediator_provider = MediatorProvider(mediator)
 

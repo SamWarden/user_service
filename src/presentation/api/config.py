@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from di.container import bind_by_type
+from di import bind_by_type
 from di.dependent import Dependent
 from didiator.utils.di_builder import DiBuilder
 
