@@ -1,24 +1,24 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 from src.application.common.exceptions import ApplicationException
-from src.domain.user.value_objects import UserId, Username
 
 
 @dataclass(eq=False)
 class UserIdAlreadyExist(ApplicationException):
-    user_id: UserId
+    user_id: UUID
 
 
 @dataclass(eq=False)
 class UsernameAlreadyExist(ApplicationException):
-    username: Username
+    username: str
 
 
 @dataclass(eq=False)
 class UserIdNotExist(ApplicationException):
-    user_id: UserId
+    user_id: UUID
 
 
 @dataclass(eq=False)
 class UsernameNotExist(ApplicationException):
-    username: Username
+    username: str

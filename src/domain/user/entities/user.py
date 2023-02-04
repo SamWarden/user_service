@@ -47,7 +47,7 @@ class User(AggregateRoot):
 
     def delete(self) -> None:
         if self.deleted:
-            raise UserAlreadyDeleted
+            raise UserAlreadyDeleted(self.id.value)
 
         self.username = None
         self.deleted = True
