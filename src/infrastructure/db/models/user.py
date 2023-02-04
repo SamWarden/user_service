@@ -2,7 +2,7 @@ from uuid import UUID
 
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
-from uuid_extensions import uuid7
+from uuid6 import uuid7
 
 from .base import TimedBaseModel
 
