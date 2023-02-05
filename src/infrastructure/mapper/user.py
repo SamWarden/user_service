@@ -72,7 +72,7 @@ def convert_db_model_to_user_dto(user: models.User) -> dto.User:
     )
 
 
-def convert_deleted_user_model_to_dto(user: models.User) -> dto.DeletedUser:
+def convert_db_model_to_deleted_user_dto(user: models.User) -> dto.DeletedUser:
     if not isinstance(user, models.User):
         raise ValueLoadError(f"Wrong mapping type: {type(user)}")
     if not user.deleted:

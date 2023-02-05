@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import Any
 
 import pytest
-from dataclass_factory import Retort, loader
-from dataclass_factory.load_error import ValueLoadError
+from dataclass_factory import Retort
+from dataclass_factory.load_error import TypeLoadError
+
+from src.infrastructure.mapper._converter import Converter
 
 
 @dataclass
@@ -48,10 +49,16 @@ class OrderOwnerDTO(UserDTO):
 DTOs = OrderDTO | UserDTO | OrderOwnerDTO
 
 
-def convert_user_entity_to_dto(user: User | object) -> UserDTO:
-    if not isinstance(user, User):
-        raise ValueLoadError(f"Wrong type, user is not User: {type(user)}")
+@dataclass
+class UserModel:
+    user_id: int
+    username: str
 
+
+# Converters
+
+
+def convert_user_entity_to_dto(user: User) -> UserDTO:
     return UserDTO(
         user_id=str(user.id),
         username=user.username,
@@ -59,9 +66,6 @@ def convert_user_entity_to_dto(user: User | object) -> UserDTO:
 
 
 def convert_order_entity_to_dto(order: Order) -> OrderDTO:
-    if not isinstance(order, Order):
-        raise ValueLoadError(f"Wrong type, order is not Order: {type(order)}")
-
     return OrderDTO(
         order_id=order.id,
         owner_id=order.owner_id,
@@ -69,9 +73,6 @@ def convert_order_entity_to_dto(order: Order) -> OrderDTO:
 
 
 def convert_order_owner_entity_to_dto(order_owner: OrderOwner) -> OrderOwnerDTO:
-    if not isinstance(order_owner, OrderOwner):
-        raise ValueLoadError(f"Wrong type: {type(order_owner)}")
-
     return OrderOwnerDTO(
         user_id=str(order_owner.id),
         username=order_owner.username,
@@ -82,9 +83,19 @@ def convert_order_owner_entity_to_dto(order_owner: OrderOwner) -> OrderOwnerDTO:
     )
 
 
+def convert_user_model_to_dto(user: UserModel) -> UserDTO:
+    return UserDTO(
+        user_id=str(user.user_id),
+        username=user.username,
+    )
+
+
+# Tests
+
+
 def test_convert_entity_to_dto():
     retort = Retort(recipe=(
-        loader(UserDTO, convert_user_entity_to_dto),
+        Converter(User, UserDTO, convert_user_entity_to_dto),
     ))
 
     assert retort.load(User(1, "Jon"), UserDTO) == UserDTO("1", "Jon")
@@ -92,17 +103,17 @@ def test_convert_entity_to_dto():
 
 def test_raise_error_on_wrong_entity_conversion():
     retort = Retort(recipe=(
-        loader(UserDTO, convert_user_entity_to_dto),
+        Converter(User, UserDTO, convert_user_entity_to_dto),
     ))
 
-    with pytest.raises(ValueLoadError):
+    with pytest.raises(TypeLoadError):
         retort.load(Order(1, 100), UserDTO)
 
 
 def test_convert_entity_to_unknown_dto():
     retort = Retort(recipe=(
-        loader(UserDTO, convert_user_entity_to_dto),
-        loader(OrderDTO, convert_order_entity_to_dto),
+        Converter(User, UserDTO, convert_user_entity_to_dto),
+        Converter(Order, OrderDTO, convert_order_entity_to_dto),
     ))
 
     assert retort.load(User(1, "Jon"), UserDTO) == UserDTO("1", "Jon")
@@ -113,8 +124,8 @@ def test_convert_entity_to_unknown_dto():
 
 def test_convert_sequence_entities_to_list_dtos():
     retort = Retort(recipe=(
-        loader(UserDTO, convert_user_entity_to_dto),
-        loader(OrderDTO, convert_order_entity_to_dto),
+        Converter(User, UserDTO, convert_user_entity_to_dto),
+        Converter(Order, OrderDTO, convert_order_entity_to_dto),
     ))
 
     assert retort.load([User(1, "Jon"), Order(1, 100)], list[DTOs]) == [UserDTO("1", "Jon"), OrderDTO(1, 100)]
@@ -124,8 +135,8 @@ def test_convert_sequence_entities_to_list_dtos():
 @pytest.mark.skip("Convert to tuple of dataclasses not working now")
 def test_convert_sequence_entities_to_tuple_dtos():
     retort = Retort(recipe=(
-        loader(UserDTO, convert_user_entity_to_dto),
-        loader(OrderDTO, convert_order_entity_to_dto),
+        Converter(User, UserDTO, convert_user_entity_to_dto),
+        Converter(Order, OrderDTO, convert_order_entity_to_dto),
     ))
 
     assert retort.load((User(1, "Jon"), Order(1, 100)), tuple[UserDTO, OrderDTO]) == (UserDTO("1", "Jon"), OrderDTO(1, 100))
@@ -135,12 +146,22 @@ def test_convert_sequence_entities_to_tuple_dtos():
 
 def test_convert_order_owner_entity_to_dto():
     retort = Retort(recipe=(
-        loader(UserDTO, convert_user_entity_to_dto),
-        loader(OrderDTO, convert_order_entity_to_dto),
-        loader(OrderOwnerDTO, convert_order_owner_entity_to_dto),
+        Converter(User, UserDTO, convert_user_entity_to_dto),
+        Converter(Order, OrderDTO, convert_order_entity_to_dto),
+        Converter(OrderOwner, OrderOwnerDTO, convert_order_owner_entity_to_dto),
     ))
 
     assert retort.load(
         OrderOwner(1, "Jon", [Order(1, 100), Order(2, 200)]),
         OrderOwnerDTO,
     ) == OrderOwnerDTO("1", "Jon", [OrderDTO(1, 100), OrderDTO(2, 200)])
+
+
+def test_convert_model_to_dto():
+    retort = Retort(recipe=(
+        Converter(User, UserDTO, convert_user_entity_to_dto),
+        Converter(UserModel, UserDTO, convert_user_model_to_dto),
+    ))
+
+    assert retort.load(User(1, "Jon"), UserDTO) == UserDTO("1", "Jon")
+    assert retort.load(UserModel(1, "Jon"), UserDTO) == UserDTO("1", "Jon")

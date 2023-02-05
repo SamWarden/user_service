@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 from src.application.common.query import Query, QueryHandler
 from src.application.user import dto
@@ -8,7 +9,7 @@ from src.domain.user.value_objects import UserId
 
 @dataclass(frozen=True)
 class GetUserById(Query[dto.UserDTOs]):
-    user_id: int
+    user_id: UUID
 
 
 class GetUserByIdHandler(QueryHandler[GetUserById, dto.UserDTOs]):
