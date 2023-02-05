@@ -1,12 +1,11 @@
-from typing import cast, NoReturn
+from typing import NoReturn
 
-from asyncpg import UniqueViolationError
 from sqlalchemy import select
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
-from src.application.common.exceptions import RepoError, UnexpectedError
+from src.application.common.exceptions import RepoError
 from src.application.user import dto
-from src.application.user.exceptions import UserIdAlreadyExist, UserIdNotExist, UsernameAlreadyExist, UsernameNotExist
+from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.application.user.interfaces.persistence import UserReader, UserRepo
 from src.domain.user import entities
 from src.domain.user.value_objects import UserId, Username
@@ -22,7 +21,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
             User.id == user_id.to_uuid(),
         ))
         if user is None:
-            raise UserIdNotExist(user_id)
+            raise UserIdNotExist(user_id.value)
 
         return self._mapper.load(user, dto.UserDTOs)
 
@@ -32,7 +31,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
             User.username == str(username),
         ))
         if user is None:
-            raise UsernameNotExist(username)
+            raise UsernameNotExist(username.value)
 
         return self._mapper.load(user, dto.User)
 
@@ -52,7 +51,7 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
             User.id == user_id.to_uuid(),
         ).with_for_update())
         if user is None:
-            raise UserIdNotExist(user_id)
+            raise UserIdNotExist(user_id.value)
 
         return self._mapper.load(user, entities.User)
 
@@ -78,8 +77,8 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     def _parse_error(self, err: DBAPIError, user: entities.User) -> NoReturn:
         match err.__cause__.__cause__.constraint_name:
             case "pk_users":
-                raise UserIdAlreadyExist(user.id) from err
+                raise UserIdAlreadyExists(user.id.value) from err
             case "uq_users_username":
-                raise UsernameAlreadyExist(user.username) from err
+                raise UsernameAlreadyExists(user.username.value) from err
             case _:
                 raise RepoError from err
