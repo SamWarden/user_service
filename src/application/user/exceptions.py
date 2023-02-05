@@ -5,12 +5,12 @@ from src.application.common.exceptions import ApplicationException
 
 
 @dataclass(eq=False)
-class UserIdAlreadyExist(ApplicationException):
+class UserIdAlreadyExists(ApplicationException):
     user_id: UUID
 
 
 @dataclass(eq=False)
-class UsernameAlreadyExist(ApplicationException):
+class UsernameAlreadyExists(ApplicationException):
     username: str
 
 
