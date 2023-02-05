@@ -10,10 +10,11 @@ from .user import (
     convert_db_model_to_user_dto,
     convert_db_model_to_user_entity,
     convert_deleted_user_entity_to_dto,
-    convert_deleted_user_model_to_dto,
+    convert_db_model_to_deleted_user_dto,
     convert_user_entity_to_db_model,
     convert_user_entity_to_dto,
 )
+from ._converter import Converter
 
 T = TypeVar("T")
 
@@ -28,10 +29,10 @@ class MapperImpl(Mapper):
 
 def build_mapper() -> MapperImpl:
     return MapperImpl(Retort(recipe=(
-        loader(application.user.dto.User, convert_user_entity_to_dto),
-        loader(application.user.dto.DeletedUser, convert_deleted_user_entity_to_dto),
-        loader(models.User, convert_user_entity_to_db_model),
-        loader(application.user.dto.User, convert_db_model_to_user_dto),
-        loader(application.user.dto.DeletedUser, convert_deleted_user_model_to_dto),
-        loader(domain.user.entities.User, convert_db_model_to_user_entity),
+        Converter(domain.user.entities.User, application.user.dto.User, convert_user_entity_to_dto),
+        Converter(domain.user.entities.User, application.user.dto.DeletedUser, convert_deleted_user_entity_to_dto),
+        Converter(domain.user.entities.User, models.User, convert_user_entity_to_db_model),
+        Converter(models.User, domain.user.entities.User, convert_db_model_to_user_entity),
+        Converter(models.User, application.user.dto.User, convert_db_model_to_user_dto),
+        Converter(models.User, application.user.dto.DeletedUser, convert_db_model_to_deleted_user_dto),
     )))
