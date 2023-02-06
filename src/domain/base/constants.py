@@ -1,4 +1,5 @@
-from typing import Any
-from unittest.mock import sentinel
+from enum import Enum
 
-UNSET: Any = sentinel.UNSET
+
+class Empty(Enum):
+    UNSET = "UNSET"

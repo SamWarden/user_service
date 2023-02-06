@@ -2,7 +2,7 @@ import dataclasses
 from typing import Self
 
 from src.domain.base.entities.aggregate_root import AggregateRoot
-from src.domain.base.constants import UNSET
+from src.domain.base.constants import Empty
 from src.domain.user.events.user_created import UserCreated
 from src.domain.user.events.user_deleted import UserDeleted
 from src.domain.user.events.user_updated import UserUpdated
@@ -33,15 +33,15 @@ class User(AggregateRoot):
 
     def update(
         self,
-        username: Username = UNSET,
-        first_name: str = UNSET,
-        last_name: str | None = UNSET,
+        username: Username | Empty = Empty.UNSET,
+        first_name: str | Empty = Empty.UNSET,
+        last_name: str | None | Empty = Empty.UNSET,
     ) -> None:
-        if username is not UNSET:
+        if username is not Empty.UNSET:
             self.username = username
-        if first_name is not UNSET:
+        if first_name is not Empty.UNSET:
             self.first_name = first_name
-        if last_name is not UNSET:
+        if last_name is not Empty.UNSET:
             self.last_name = last_name
         self.record_event(UserUpdated(self.id, self.username, self.first_name, self.last_name))
 
