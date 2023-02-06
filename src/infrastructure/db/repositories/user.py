@@ -6,7 +6,8 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from src.application.common.exceptions import RepoError
 from src.application.user import dto
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
-from src.application.user.interfaces.persistence import UserReader, UserRepo
+from src.application.user.interfaces.persistence import GetUsersFilters, GetUsersOrder, UserReader, UserRepo
+from src.domain.base.constants import Empty
 from src.domain.user import entities
 from src.domain.user.value_objects import UserId, Username
 from src.infrastructure.db.exception_mapper import exception_mapper
@@ -36,8 +37,22 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
         return self._mapper.load(user, dto.User)
 
     @exception_mapper
-    async def get_users(self) -> tuple[dto.UserDTOs, ...]:
-        result = await self._session.scalars(select(User))
+    async def get_users(self, filters: GetUsersFilters) -> tuple[dto.UserDTOs, ...]:
+        query = select(User)
+
+        if filters.order is GetUsersOrder.DESC:
+            query = query.order_by(User.id.desc())
+        else:
+            query = query.order_by(User.id.asc())
+
+        if filters.deleted is not Empty.UNSET:
+            query = query.where(User.deleted == filters.deleted)
+        if filters.offset is not Empty.UNSET:
+            query = query.offset(filters.offset)
+        if filters.limit is not Empty.UNSET:
+            query = query.limit(filters.limit)
+
+        result = await self._session.scalars(query)
         users = result.all()
 
         return tuple(self._mapper.load(users, list[dto.UserDTOs]))
