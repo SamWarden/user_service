@@ -6,8 +6,6 @@ from src.infrastructure.db import models
 
 
 def convert_user_entity_to_dto(user: entities.User) -> dto.User:
-    if not isinstance(user, entities.User):
-        raise ValueLoadError(f"Wrong mapping type: {type(user)}")
     if user.deleted:
         raise ValueLoadError(f"User {user} is deleted")
 
@@ -20,8 +18,6 @@ def convert_user_entity_to_dto(user: entities.User) -> dto.User:
 
 
 def convert_deleted_user_entity_to_dto(user: entities.User) -> dto.DeletedUser:
-    if not isinstance(user, entities.User):
-        raise ValueLoadError(f"Wrong mapping type: {type(user)}")
     if not user.deleted:
         raise ValueLoadError(f"User {user} isn't deleted")
 
@@ -33,9 +29,6 @@ def convert_deleted_user_entity_to_dto(user: entities.User) -> dto.DeletedUser:
 
 
 def convert_user_entity_to_db_model(user: entities.User) -> models.User:
-    if not isinstance(user, entities.User):
-        raise ValueLoadError(f"Wrong mapping type: {type(user)}")
-
     return models.User(
         id=user.id.to_uuid(),
         username=str(user.username),
@@ -46,11 +39,8 @@ def convert_user_entity_to_db_model(user: entities.User) -> models.User:
 
 
 def convert_db_model_to_user_entity(user: models.User) -> entities.User:
-    if not isinstance(user, models.User):
-        raise ValueLoadError(f"Wrong mapping type: {type(user)}")
-
     return entities.User(
-        id=user.id,
+        id=vo.UserId(user.id),
         username=vo.Username(user.username),
         first_name=user.first_name,
         last_name=user.last_name,
@@ -59,8 +49,6 @@ def convert_db_model_to_user_entity(user: models.User) -> entities.User:
 
 
 def convert_db_model_to_user_dto(user: models.User) -> dto.User:
-    if not isinstance(user, models.User):
-        raise ValueLoadError(f"Wrong mapping type: {type(user)}")
     if user.deleted:
         raise ValueLoadError(f"User {user} is deleted")
 
@@ -73,8 +61,6 @@ def convert_db_model_to_user_dto(user: models.User) -> dto.User:
 
 
 def convert_db_model_to_deleted_user_dto(user: models.User) -> dto.DeletedUser:
-    if not isinstance(user, models.User):
-        raise ValueLoadError(f"Wrong mapping type: {type(user)}")
     if not user.deleted:
         raise ValueLoadError(f"User {user} isn't deleted")
 
