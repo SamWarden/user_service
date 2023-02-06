@@ -67,10 +67,8 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     @exception_mapper
     async def update_user(self, user: entities.User) -> None:
         db_user = self._mapper.load(user, User)
-        # TODO: try to use merge
-        self._session.add(db_user)
         try:
-            await self._session.flush((db_user,))
+            await self._session.merge(db_user)
         except IntegrityError as err:
             self._parse_error(err, user)
 
