@@ -11,6 +11,8 @@ class NegativeTimestamp(DomainException, ValueError):
 
 
 class Timestamp(ValueObject[int]):
+    value: int
+
     def _validate(self) -> None:
         if self.value < 0:
             raise NegativeTimestamp

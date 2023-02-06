@@ -26,6 +26,8 @@ class WrongUsernameFormat(WrongUsernameValue):
 
 
 class Username(ValueObject[str]):
+    value: str
+
     def _validate(self) -> None:
         if self.value == "":
             raise EmptyUsername(self.value)
