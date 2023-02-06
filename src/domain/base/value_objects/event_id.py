@@ -7,6 +7,8 @@ from src.domain.base.value_objects.base import ValueObject
 
 
 class EventId(ValueObject[UUID]):
+    value: UUID
+
     @classmethod
     def generate(cls) -> Self:
         return cls(uuid7())
