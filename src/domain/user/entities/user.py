@@ -6,7 +6,7 @@ from src.domain.base.constants import Empty
 from src.domain.user.events.user_created import UserCreated
 from src.domain.user.events.user_deleted import UserDeleted
 from src.domain.user.events.user_updated import UserUpdated
-from src.domain.user.exceptions import UserAlreadyDeleted
+from src.domain.user.exceptions import UserIsDeleted
 from src.domain.user.value_objects.user_id import UserId
 from src.domain.user.value_objects.username import Username
 
@@ -37,6 +37,8 @@ class User(AggregateRoot):
         first_name: str | Empty = Empty.UNSET,
         last_name: str | None | Empty = Empty.UNSET,
     ) -> None:
+        self._validate_not_deleted()
+
         if username is not Empty.UNSET:
             self.username = username
         if first_name is not Empty.UNSET:
@@ -46,9 +48,12 @@ class User(AggregateRoot):
         self.record_event(UserUpdated(self.id, self.username, self.first_name, self.last_name))
 
     def delete(self) -> None:
-        if self.deleted:
-            raise UserAlreadyDeleted(self.id.value)
+        self._validate_not_deleted()
 
         self.username = None
         self.deleted = True
         self.record_event(UserDeleted(self.id))
+
+    def _validate_not_deleted(self) -> None:
+        if self.deleted:
+            raise UserIsDeleted(self.id.value)

@@ -9,6 +9,7 @@ from src.application.user.commands import CreateUser, DeleteUser
 from src.application.user.commands.update_user import UpdateUser, UpdateUserData
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.application.user.queries import GetUserById, GetUserByUsername, GetUsers
+from src.domain.user.exceptions import UserIsDeleted
 from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.presentation.api.controllers import requests, responses
 from src.presentation.api.providers.stub import Stub
@@ -84,9 +85,8 @@ async def get_users(
     "/{user_id}",
     responses={
         status.HTTP_200_OK: {"model": dto.User},
-        status.HTTP_400_BAD_REQUEST: {
-            "model": UserIdNotExist | UsernameAlreadyExists,
-        },
+        status.HTTP_400_BAD_REQUEST: {"model": UserIdNotExist | UsernameAlreadyExists},
+        status.HTTP_409_CONFLICT: {"model": UserIsDeleted},
     },
 )
 async def update_user(
@@ -105,6 +105,7 @@ async def update_user(
     responses={
         status.HTTP_200_OK: {"model": dto.DeletedUser},
         status.HTTP_404_NOT_FOUND: {"model": UserIdNotExist},
+        status.HTTP_409_CONFLICT: {"model": UserIsDeleted},
     },
 )
 async def delete_user(
