@@ -7,6 +7,7 @@ from didiator import Mediator
 from didiator.utils.di_builder import DiBuilder
 from fastapi import FastAPI
 
+from src.application.common.interfaces.mapper import Mapper
 from src.presentation.api.controllers import setup_controllers
 from src.presentation.api.middlewares import setup_middlewares
 from src.presentation.api.providers import setup_providers
@@ -18,12 +19,13 @@ logger = structlog.get_logger()
 
 def init_api(
     mediator: Mediator,
+    mapper: Mapper,
     di_builder: DiBuilder,
     di_state: ScopeState | None = None,
 ) -> FastAPI:
     logger.debug("Initialize API")
     app = FastAPI()
-    setup_providers(app, mediator, di_builder, di_state)
+    setup_providers(app, mediator, mapper, di_builder, di_state)
     setup_middlewares(app)
     setup_controllers(app)
     return app

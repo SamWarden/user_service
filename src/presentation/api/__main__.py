@@ -2,6 +2,7 @@ import asyncio
 
 import structlog
 
+from src.application.common.interfaces.mapper import Mapper
 from src.infrastructure.config_loader import load_config
 from src.infrastructure.di import init_di_builder, setup_di_builder
 from src.infrastructure.constants import APP_SCOPE
@@ -28,7 +29,9 @@ async def main() -> None:
         mediator = await di_builder.execute(init_mediator, APP_SCOPE, state=di_state)
         setup_mediator(mediator)
 
-        app = init_api(mediator, di_builder, di_state)
+        mapper = await di_builder.execute(Mapper, APP_SCOPE, state=di_state)
+
+        app = init_api(mediator, mapper, di_builder, di_state)
         await run_api(app, config.api)
 
 
