@@ -1,11 +1,16 @@
+from uuid import UUID
+
 from didiator import CommandMediator, QueryMediator
 from fastapi import APIRouter, Depends, status
 
+from src.application.common.interfaces.mapper import Mapper
 from src.application.user import dto
-from src.application.user.commands import CreateUser
-from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists
-from src.application.user.queries import GetUserById
+from src.application.user.commands import CreateUser, DeleteUser
+from src.application.user.commands.update_user import UpdateUser, UpdateUserData
+from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
+from src.application.user.queries import GetUserById, GetUserByUsername, GetUsers
 from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
+from src.presentation.api.controllers import requests, responses
 from src.presentation.api.providers.stub import Stub
 
 user_router = APIRouter(
@@ -33,3 +38,78 @@ async def create_user(
 ) -> dto.User:
     user = await mediator.send(create_user_command)
     return user
+
+
+@user_router.get(
+    "/@{username}",
+    responses={
+        status.HTTP_200_OK: {"model": dto.User},
+        status.HTTP_404_NOT_FOUND: {"model": UsernameNotExist},
+    },
+)
+async def get_user_by_username(
+    username: str,
+    mediator: QueryMediator = Depends(Stub(QueryMediator)),
+) -> dto.User:
+    user = await mediator.query(GetUserByUsername(username=username))
+    return user
+
+
+@user_router.get(
+    "/{user_id}",
+    responses={
+        status.HTTP_200_OK: {"model": dto.UserDTOs},
+        status.HTTP_404_NOT_FOUND: {"model": UserIdNotExist},
+    },
+)
+async def get_user_by_id(
+    user_id: UUID,
+    mediator: QueryMediator = Depends(Stub(QueryMediator)),
+) -> dto.UserDTOs:
+    user = await mediator.query(GetUserById(user_id=user_id))
+    return user
+
+
+@user_router.get(
+    "/", description="Return all users",
+)
+async def get_users(
+    mediator: QueryMediator = Depends(Stub(QueryMediator)),
+) -> responses.Users:
+    users = await mediator.query(GetUsers())
+    return responses.Users(users=users)
+
+
+@user_router.patch(
+    "/{user_id}",
+    responses={
+        status.HTTP_200_OK: {"model": dto.User},
+        status.HTTP_400_BAD_REQUEST: {
+            "model": UserIdNotExist | UsernameAlreadyExists,
+        },
+    },
+)
+async def update_user(
+    user_id: UUID,
+    update_user_data: requests.UpdateUserData,
+    mapper: Mapper = Depends(Stub(Mapper)),
+    mediator: CommandMediator = Depends(Stub(CommandMediator)),
+) -> dto.User:
+    user_data = mapper.load(update_user_data, UpdateUserData)
+    user = await mediator.send(UpdateUser(user_id=user_id, user_data=user_data))
+    return user
+
+
+@user_router.delete(
+    "/{user_id}",
+    responses={
+        status.HTTP_200_OK: {"model": dto.DeletedUser},
+        status.HTTP_404_NOT_FOUND: {"model": UserIdNotExist},
+    },
+)
+async def delete_user(
+    user_id: UUID,
+    mediator: CommandMediator = Depends(Stub(CommandMediator)),
+) -> dto.DeletedUser:
+    deleted_user = await mediator.send(DeleteUser(user_id=user_id))
+    return deleted_user
