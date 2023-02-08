@@ -1,13 +1,16 @@
 from dataclasses import dataclass
 
 from src.application.common.query import Query, QueryHandler
-from src.application.user import dto
+from src.application.user import dto, validators
 from src.application.user.interfaces import UserReader
 
 
 @dataclass(frozen=True)
 class GetUserByUsername(Query[dto.User]):
     username: str
+
+    def __post_init__(self) -> None:
+        validators.validate_username(self.username)
 
 
 class GetUserByUsernameHandler(QueryHandler[GetUserByUsername, dto.User]):

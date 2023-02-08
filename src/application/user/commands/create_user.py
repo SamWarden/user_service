@@ -6,7 +6,7 @@ from didiator import EventMediator
 from src.application.common.command import Command, CommandHandler
 from src.application.common.interfaces.mapper import Mapper
 from src.application.common.interfaces.uow import UnitOfWork
-from src.application.user import dto
+from src.application.user import dto, validators
 from src.application.user.interfaces import UserRepo
 from src.domain.user.entities import User
 from src.domain.user.value_objects import UserId, Username
@@ -18,6 +18,9 @@ class CreateUser(Command[dto.User]):
     username: str
     first_name: str
     last_name: str | None
+
+    def __post_init__(self) -> None:
+        validators.validate_username(self.username)
 
 
 class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
