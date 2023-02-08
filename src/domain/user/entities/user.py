@@ -22,7 +22,7 @@ class User(AggregateRoot):
     @classmethod
     def create(cls, user_id: UserId, username: Username, first_name: str, last_name: str | None) -> Self:
         user = User(user_id, username, first_name, last_name)
-        user.record_event(UserCreated(user_id, username, first_name, last_name))
+        user.record_event(UserCreated(user_id.to_uuid(), str(username), first_name, last_name))
         return user
 
     @property
@@ -45,15 +45,15 @@ class User(AggregateRoot):
             self.first_name = first_name
         if last_name is not Empty.UNSET:
             self.last_name = last_name
-        self.record_event(UserUpdated(self.id, self.username, self.first_name, self.last_name))
+        self.record_event(UserUpdated(self.id.to_uuid(), str(self.username), self.first_name, self.last_name))
 
     def delete(self) -> None:
         self._validate_not_deleted()
 
         self.username = None
         self.deleted = True
-        self.record_event(UserDeleted(self.id))
+        self.record_event(UserDeleted(self.id.to_uuid()))
 
     def _validate_not_deleted(self) -> None:
         if self.deleted:
-            raise UserIsDeleted(self.id.value)
+            raise UserIsDeleted(self.id.to_uuid())

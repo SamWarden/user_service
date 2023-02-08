@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Protocol
+from uuid import UUID
 
 from src.application.user import dto
 from src.domain.base.constants import Empty
-from src.domain.user.value_objects import UserId, Username
 
 
 class GetUsersOrder(Enum):
@@ -21,10 +21,10 @@ class GetUsersFilters:
 
 
 class UserReader(Protocol):
-    async def get_user_by_id(self, user_id: UserId) -> dto.UserDTOs:
+    async def get_user_by_id(self, user_id: UUID) -> dto.UserDTOs:
         raise NotImplementedError
 
-    async def get_user_by_username(self, username: Username) -> dto.User:
+    async def get_user_by_username(self, username: str) -> dto.User:
         raise NotImplementedError
 
     async def get_users(self, filters: GetUsersFilters) -> tuple[dto.UserDTOs, ...]:
