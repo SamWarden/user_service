@@ -8,7 +8,7 @@ from src.application.common.exceptions import RepoError
 from src.application.user import dto
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.application.user.interfaces.persistence import GetUsersFilters, GetUsersOrder, UserReader, UserRepo
-from src.domain.base.constants import Empty
+from src.domain.common.constants import Empty
 from src.domain.user import entities
 from src.domain.user.value_objects import UserId
 from src.infrastructure.db.exception_mapper import exception_mapper

@@ -1,7 +1,7 @@
 import time
 from typing import Self
 
-from src.domain.base.exceptions import DomainException
+from src.domain.common.exceptions import DomainException
 
 from .base import ValueObject
 

@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 
 import didiator
 
-from src.domain.base.value_objects.event_id import EventId
-from src.domain.base.value_objects.time import Timestamp
+from src.domain.common.value_objects.event_id import EventId
+from src.domain.common.value_objects.time import Timestamp
 
 
 @dataclass(frozen=True)

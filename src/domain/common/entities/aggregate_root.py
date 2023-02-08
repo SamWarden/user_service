@@ -1,7 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass, field
 
-from src.domain.base.events.event import Event
+from src.domain.common.events.event import Event
 
 from .entity import Entity
 

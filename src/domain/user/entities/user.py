@@ -1,8 +1,8 @@
 import dataclasses
 from typing import Self
 
-from src.domain.base.entities.aggregate_root import AggregateRoot
-from src.domain.base.constants import Empty
+from src.domain.common.entities.aggregate_root import AggregateRoot
+from src.domain.common.constants import Empty
 from src.domain.user.events.user_created import UserCreated
 from src.domain.user.events.user_deleted import UserDeleted
 from src.domain.user.events.user_updated import UserUpdated

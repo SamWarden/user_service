@@ -1,4 +1,4 @@
-from src.domain.base.value_objects.base import ValueObject
+from src.domain.common.value_objects.base import ValueObject
 
 
 class Username(ValueObject[str]):

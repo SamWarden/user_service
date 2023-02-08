@@ -3,7 +3,7 @@ from uuid import UUID
 
 from uuid6 import uuid7
 
-from src.domain.base.value_objects.base import ValueObject
+from src.domain.common.value_objects.base import ValueObject
 
 
 class EventId(ValueObject[UUID]):
