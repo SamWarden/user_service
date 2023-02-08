@@ -4,6 +4,7 @@ from didiator.interface.utils.di_builder import DiBuilder
 from fastapi import FastAPI
 
 from src.application.common.interfaces.mapper import Mapper
+from src.presentation.api.presenter import build_presenter, Presenter
 
 from .di import get_di_builder, get_di_state, StateProvider
 from .mediator import MediatorProvider
@@ -30,3 +31,7 @@ def setup_providers(
 
     app.dependency_overrides[get_di_builder] = lambda: di_builder
     app.dependency_overrides[get_di_state] = state_provider.build
+
+    presenter = build_presenter()
+
+    app.dependency_overrides[Stub(Presenter)] = lambda: presenter
