@@ -4,8 +4,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
+from src.application.user.validators.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.domain.user.exceptions import UserIsDeleted
-from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 
 
 def setup_exception_handlers(app: FastAPI) -> None:
