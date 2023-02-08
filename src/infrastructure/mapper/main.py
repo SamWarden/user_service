@@ -14,7 +14,7 @@ from .user import (
     convert_user_entity_to_db_model,
     convert_user_entity_to_dto,
 )
-from ._converter import Converter
+from .converter import Converter
 
 T = TypeVar("T")
 
@@ -23,7 +23,7 @@ class MapperImpl(Mapper):
     def __init__(self, retort: Retort) -> None:
         self._retort = retort
 
-    def load(self, data: Any, class_: Type[T]) -> T:
+    def load(self, data: Any, class_: type[T]) -> T:
         return self._retort.load(data, class_)
 
 

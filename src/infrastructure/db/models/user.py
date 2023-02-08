@@ -11,8 +11,8 @@ class User(TimedBaseModel):
     __tablename__ = "users"
     __mapper_args__ = {"eager_defaults": True}
 
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7, server_default=sa.text("uuid_generate_v7()"))
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7, server_default=sa.func.uuid_generate_v7())
     username: Mapped[str | None] = mapped_column(unique=True)
     first_name: Mapped[str]
     last_name: Mapped[str | None]
-    deleted: Mapped[bool] = mapped_column(default=False, server_default=sa.text("FALSE"))
+    deleted: Mapped[bool] = mapped_column(default=False, server_default=sa.False_())

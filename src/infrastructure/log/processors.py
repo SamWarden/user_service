@@ -16,7 +16,6 @@ def additionally_serialize(obj: Any) -> Any:
 
 
 def serialize_to_json(data: Any, default: Any) -> str:
-    # print(data)
     return orjson.dumps(data, default=additionally_serialize).decode()
 
 

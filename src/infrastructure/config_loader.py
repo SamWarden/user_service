@@ -13,7 +13,7 @@ def read_toml(path: str) -> dict:
         return tomllib.load(f)
 
 
-def load_config(config_type: Type[T], config_scope: str | None = None, path: str = CONFIG_PATH) -> T:
+def load_config(config_type: type[T], config_scope: str | None = None, path: str = CONFIG_PATH) -> T:
     data = read_toml(path)
 
     if config_scope is not None:

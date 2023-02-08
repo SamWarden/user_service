@@ -16,6 +16,7 @@ from src.domain.user.value_objects.username import (
     EmptyUsername, MAX_USERNAME_LENGTH, TooLongUsername, WrongUsernameFormat,
 )
 from src.presentation.api.controllers import requests, responses
+from src.presentation.api.presenter import Presenter
 from src.presentation.api.providers.stub import Stub
 
 user_router = APIRouter(
@@ -84,6 +85,7 @@ async def get_users(
     limit: int = Query(1000, ge=0, le=1000),
     order: GetUsersOrder = GetUsersOrder.ASC,
     mediator: QueryMediator = Depends(Stub(QueryMediator)),
+    presenter: Presenter = Depends(Stub(Presenter)),
 ) -> responses.Users:
     users = await mediator.query(GetUsers(
         deleted=deleted if deleted is not None else Empty.UNSET,
@@ -91,7 +93,7 @@ async def get_users(
         limit=limit,
         order=order,
     ))
-    return responses.Users(users=users)
+    return presenter.load(users, responses.Users)
 
 
 @user_router.patch(

@@ -8,19 +8,25 @@ from src.domain.base.constants import Empty
 
 
 @dataclass(frozen=True)
-class GetUsers(Query[tuple[dto.UserDTOs, ...]]):
+class GetUsers(Query[dto.Users]):
     deleted: bool | Empty = Empty.UNSET
     offset: int | Empty = Empty.UNSET
     limit: int | Empty = Empty.UNSET
     order: GetUsersOrder = GetUsersOrder.ASC
 
 
-class GetUsersHandler(QueryHandler[GetUsers, tuple[dto.UserDTOs, ...]]):
+class GetUsersHandler(QueryHandler[GetUsers, dto.Users]):
     def __init__(self, user_reader: UserReader) -> None:
         self._user_reader = user_reader
 
-    async def __call__(self, query: GetUsers) -> tuple[dto.UserDTOs, ...]:
+    async def __call__(self, query: GetUsers) -> dto.Users:
         users = await self._user_reader.get_users(GetUsersFilters(
             deleted=query.deleted, offset=query.offset, limit=query.limit, order=query.order,
         ))
-        return users
+        users_count = await self._user_reader.get_users_count(query.deleted)
+        return dto.Users(
+            users=users,
+            total=users_count,
+            offset=query.offset,
+            limit=query.limit,
+        )

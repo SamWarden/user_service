@@ -1,6 +1,6 @@
 from typing import NoReturn
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from src.application.common.exceptions import RepoError
@@ -47,6 +47,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
 
         if filters.deleted is not Empty.UNSET:
             query = query.where(User.deleted == filters.deleted)
+
         if filters.offset is not Empty.UNSET:
             query = query.offset(filters.offset)
         if filters.limit is not Empty.UNSET:
@@ -57,6 +58,15 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
 
         return tuple(self._mapper.load(users, list[dto.UserDTOs]))
         # return self._mapper.load(users, tuple[dto.UserDTOs, ...])
+
+    async def get_users_count(self, deleted: bool | Empty = Empty.UNSET) -> int:
+        query = select(func.count(User.id))
+
+        if deleted is not Empty.UNSET:
+            query = query.where(User.deleted == deleted)
+
+        users_count = await self._session.scalar(query)
+        return users_count or 0
 
 
 class UserRepoImpl(SQLAlchemyRepo, UserRepo):
