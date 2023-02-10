@@ -11,7 +11,9 @@ from src.application.user.commands import UpdateUser, UpdateUserHandler
 from src.application.user.queries.get_user_by_id import GetUserById, GetUserByIdHandler
 from src.application.user.queries.get_user_by_username import GetUserByUsername, GetUserByUsernameHandler
 from src.application.user.queries.get_users import GetUsers, GetUsersHandler
+from src.domain.common.events import Event
 from src.infrastructure.constants import REQUEST_SCOPE
+from src.infrastructure.event_bus.event_handler import EventHandlerPublisher
 
 
 def init_mediator(di_builder: DiBuilder) -> Mediator:
@@ -34,4 +36,4 @@ def setup_mediator(mediator: Mediator) -> None:
     mediator.register_query_handler(GetUserById, GetUserByIdHandler)
     mediator.register_query_handler(GetUserByUsername, GetUserByUsernameHandler)
     mediator.register_query_handler(GetUsers, GetUsersHandler)
-    # mediator.register_event_handler(UserCreated, UserCreatedHandler)
+    mediator.register_event_handler(Event, EventHandlerPublisher)
