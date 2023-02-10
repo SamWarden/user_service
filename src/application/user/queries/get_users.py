@@ -4,7 +4,7 @@ from src.application.common.query import Query, QueryHandler
 from src.application.user import dto
 from src.application.user.interfaces import UserReader
 from src.application.user.interfaces.persistence import GetUsersFilters, GetUsersOrder
-from src.domain.base.constants import Empty
+from src.domain.common.constants import Empty
 
 
 @dataclass(frozen=True)

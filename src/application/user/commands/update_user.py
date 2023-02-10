@@ -8,7 +8,7 @@ from src.application.common.interfaces.mapper import Mapper
 from src.application.common.interfaces.uow import UnitOfWork
 from src.application.user import dto, validators
 from src.application.user.interfaces import UserRepo
-from src.domain.base.constants import Empty
+from src.domain.common.constants import Empty
 from src.domain.user.value_objects import UserId, Username
 
 

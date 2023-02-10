@@ -1,3 +1,4 @@
+import aio_pika
 from di import bind_by_type, Container
 from di.api.providers import DependencyProviderType
 from di.api.scopes import Scope
@@ -16,8 +17,12 @@ from src.infrastructure.constants import APP_SCOPE, REQUEST_SCOPE
 from src.infrastructure.db.main import build_sa_engine, build_sa_session, build_sa_session_factory
 from src.infrastructure.db.repositories.user import UserReaderImpl, UserRepoImpl
 from src.infrastructure.db.uow import SQLAlchemyUoW
+from src.infrastructure.event_bus.event_bus import EventBusImpl
+from src.infrastructure.event_bus.message_broker import MessageBroker
 from src.infrastructure.mapper.main import build_mapper
 from src.infrastructure.mediator import get_mediator
+from src.infrastructure.message_broker.main import build_rq_channel, build_rq_channel_pool, build_rq_connection_pool
+from src.infrastructure.message_broker.message_broker import MessageBrokerImpl
 
 
 def init_di_builder() -> DiBuilder:
@@ -33,6 +38,7 @@ def setup_di_builder(di_builder: DiBuilder) -> None:
     di_builder.bind(bind_by_type(Dependent(build_mapper, scope=APP_SCOPE), Mapper))
     setup_mediator_factory(di_builder, get_mediator, REQUEST_SCOPE)
     setup_db_factories(di_builder)
+    setup_event_bus_factories(di_builder)
 
 
 def setup_mediator_factory(
@@ -53,3 +59,15 @@ def setup_db_factories(di_builder: DiBuilder) -> None:
     di_builder.bind(bind_by_type(Dependent(SQLAlchemyUoW, scope=REQUEST_SCOPE), UnitOfWork))
     di_builder.bind(bind_by_type(Dependent(UserRepoImpl, scope=REQUEST_SCOPE), UserRepo, covariant=True))
     di_builder.bind(bind_by_type(Dependent(UserReaderImpl, scope=REQUEST_SCOPE), UserReader, covariant=True))
+
+
+def setup_event_bus_factories(di_builder: DiBuilder) -> None:
+    di_builder.bind(bind_by_type(
+        Dependent(build_rq_connection_pool, scope=APP_SCOPE), aio_pika.pool.Pool[aio_pika.abc.AbstractConnection],
+    ))
+    di_builder.bind(bind_by_type(
+        Dependent(build_rq_channel_pool, scope=APP_SCOPE), aio_pika.pool.Pool[aio_pika.abc.AbstractChannel],
+    ))
+    di_builder.bind(bind_by_type(Dependent(build_rq_channel, scope=APP_SCOPE), aio_pika.abc.AbstractChannel))
+    di_builder.bind(bind_by_type(Dependent(MessageBrokerImpl, scope=APP_SCOPE), MessageBroker))
+    di_builder.bind(bind_by_type(Dependent(EventBusImpl, scope=APP_SCOPE), EventBusImpl))

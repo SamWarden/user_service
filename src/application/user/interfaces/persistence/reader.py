@@ -4,7 +4,7 @@ from typing import Protocol
 from uuid import UUID
 
 from src.application.user import dto
-from src.domain.base.constants import Empty
+from src.domain.common.constants import Empty
 
 
 class GetUsersOrder(Enum):

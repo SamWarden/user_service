@@ -1,5 +1,5 @@
 from src.application.user import dto
-from src.domain.base.constants import Empty
+from src.domain.common.constants import Empty
 from src.presentation.api.controllers import responses
 
 

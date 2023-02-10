@@ -10,9 +10,10 @@ from src.application.user.commands.update_user import UpdateUser, UpdateUserData
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.application.user.interfaces.persistence import GetUsersOrder
 from src.application.user.queries import GetUserById, GetUserByUsername, GetUsers
-from src.application.user.validators.username import EmptyUsername, MAX_USERNAME_LENGTH, TooLongUsername, \
-    WrongUsernameFormat
-from src.domain.base.constants import Empty
+from src.application.user.validators.username import (
+    EmptyUsername, MAX_USERNAME_LENGTH, TooLongUsername, WrongUsernameFormat,
+)
+from src.domain.common.constants import Empty
 from src.domain.user.exceptions import UserIsDeleted
 from src.presentation.api.controllers import requests, responses
 from src.presentation.api.presenter import Presenter

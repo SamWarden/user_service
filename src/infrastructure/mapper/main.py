@@ -1,11 +1,17 @@
-from typing import Any, Type, TypeVar
+from typing import Any, TypeVar
 
-from dataclass_factory import loader, Retort
+from dataclass_factory import Retort
 
 from src import application, domain
 from src.application.common.interfaces.mapper import Mapper
 from src.infrastructure.db import models
+from src.infrastructure import event_bus
 
+from .events import (
+    convert_user_created_to_integration,
+    convert_user_updated_to_integration,
+    convert_user_deleted_to_integration,
+)
 from .user import (
     convert_db_model_to_user_dto,
     convert_db_model_to_user_entity,
@@ -35,4 +41,8 @@ def build_mapper() -> MapperImpl:
         Converter(models.User, domain.user.entities.User, convert_db_model_to_user_entity),
         Converter(models.User, application.user.dto.User, convert_db_model_to_user_dto),
         Converter(models.User, application.user.dto.DeletedUser, convert_db_model_to_deleted_user_dto),
+
+        Converter(domain.user.events.UserCreated, event_bus.events.UserCreated, convert_user_created_to_integration),
+        Converter(domain.user.events.UserUpdated, event_bus.events.UserUpdated, convert_user_updated_to_integration),
+        Converter(domain.user.events.UserDeleted, event_bus.events.UserDeleted, convert_user_deleted_to_integration),
     )))

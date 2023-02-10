@@ -1,0 +1,1 @@
+USER_EXCHANGE = "users"

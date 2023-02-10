@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from typing import Any
+from uuid import UUID
 
 import orjson
 import structlog
@@ -12,6 +13,8 @@ ProcessorType = Callable[
 
 
 def additionally_serialize(obj: Any) -> Any:
+    if isinstance(obj, UUID):
+        return str(obj)
     raise TypeError(f"TypeError: Type is not JSON serializable: {type(obj)}")
 
 
