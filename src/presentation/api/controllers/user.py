@@ -16,6 +16,7 @@ from src.application.user.validators.username import (
 from src.domain.common.constants import Empty
 from src.domain.user.exceptions import UserIsDeleted
 from src.presentation.api.controllers import requests, responses
+from src.presentation.api.controllers.responses import ErrorResult
 from src.presentation.api.presenter import Presenter
 from src.presentation.api.providers.stub import Stub
 
@@ -30,10 +31,10 @@ user_router = APIRouter(
     responses={
         status.HTTP_201_CREATED: {"model": dto.User},
         status.HTTP_400_BAD_REQUEST: {
-            "model": TooLongUsername | EmptyUsername | WrongUsernameFormat,
+            "model": ErrorResult[TooLongUsername | EmptyUsername | WrongUsernameFormat],  # type: ignore
         },
         status.HTTP_409_CONFLICT: {
-            "model": UsernameAlreadyExists | UserIdAlreadyExists,
+            "model": ErrorResult[UsernameAlreadyExists | UserIdAlreadyExists],  # type: ignore
         }
     },
     status_code=status.HTTP_201_CREATED,
@@ -50,7 +51,7 @@ async def create_user(
     "/@{username}",
     responses={
         status.HTTP_200_OK: {"model": dto.User},
-        status.HTTP_404_NOT_FOUND: {"model": UsernameNotExist},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResult[UsernameNotExist]},
     },
 )
 async def get_user_by_username(
@@ -65,7 +66,7 @@ async def get_user_by_username(
     "/{user_id}",
     responses={
         status.HTTP_200_OK: {"model": dto.UserDTOs},
-        status.HTTP_404_NOT_FOUND: {"model": UserIdNotExist},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResult[UserIdNotExist]},
     },
 )
 async def get_user_by_id(
@@ -100,8 +101,8 @@ async def get_users(
     "/{user_id}",
     responses={
         status.HTTP_200_OK: {"model": dto.User},
-        status.HTTP_400_BAD_REQUEST: {"model": UserIdNotExist | UsernameAlreadyExists},
-        status.HTTP_409_CONFLICT: {"model": UserIsDeleted},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResult[UserIdNotExist | UsernameAlreadyExists]},  # type: ignore
+        status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
     },
 )
 async def update_user(
@@ -119,8 +120,8 @@ async def update_user(
     "/{user_id}",
     responses={
         status.HTTP_200_OK: {"model": dto.DeletedUser},
-        status.HTTP_404_NOT_FOUND: {"model": UserIdNotExist},
-        status.HTTP_409_CONFLICT: {"model": UserIsDeleted},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResult[UserIdNotExist]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
     },
 )
 async def delete_user(

@@ -1,10 +1,9 @@
 from orjson import orjson
 
-from src.infrastructure.message_broker.message import Message
+from src.infrastructure.message_broker import Message, MessageBroker
 from src.infrastructure.log.processors import additionally_serialize
 
 from .events.base import IntegrationEvent
-from .message_broker import MessageBroker
 
 
 class EventBusImpl:

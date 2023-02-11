@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from src.infrastructure.message_broker.message import Message
+from .message import Message
 
 
 class MessageBroker(Protocol):
