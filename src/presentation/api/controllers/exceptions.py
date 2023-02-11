@@ -1,24 +1,25 @@
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import JSONResponse
 
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.application.user.validators.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.domain.user.exceptions import UserIsDeleted
+from src.presentation.api.controllers.responses import ErrorResult
 
 
 def setup_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(Exception, exception_handler)
 
 
-async def exception_handler(request: Request, err: Exception) -> JSONResponse:
+async def exception_handler(request: Request, err: Exception) -> ORJSONResponse:
     match err:
-        case TooLongUsername() | EmptyUsername() | WrongUsernameFormat():
-            return JSONResponse(status.HTTP_400_BAD_REQUEST)
-        case UserIdNotExist() | UsernameNotExist():
-            return JSONResponse(status.HTTP_404_NOT_FOUND)
-        case UsernameAlreadyExists() | UserIdAlreadyExists() | UserIsDeleted():
-            return JSONResponse(status.HTTP_409_CONFLICT)
+        case TooLongUsername() | EmptyUsername() | WrongUsernameFormat() as err:
+            return ORJSONResponse(ErrorResult(message=err.message, data=err), status_code=status.HTTP_400_BAD_REQUEST)
+        case UserIdNotExist() | UsernameNotExist() as err:
+            return ORJSONResponse(ErrorResult(message=err.message, data=err), status_code=status.HTTP_404_NOT_FOUND)
+        case UsernameAlreadyExists() | UserIdAlreadyExists() | UserIsDeleted() as err:
+            return ORJSONResponse(ErrorResult(message=err.message, data=err), status_code=status.HTTP_409_CONFLICT)
         case _:
-            return JSONResponse(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return ORJSONResponse(ErrorResult(message="Unknown server error has occurred", data=err), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

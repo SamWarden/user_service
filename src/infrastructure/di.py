@@ -7,8 +7,7 @@ from di.executors import AsyncExecutor
 from didiator import CommandMediator, EventMediator, Mediator, QueryMediator
 from didiator.interface.utils.di_builder import DiBuilder
 from didiator.utils.di_builder import DiBuilderImpl
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncEngine, AsyncSession
 
 from src.application.common.interfaces.mapper import Mapper
 from src.application.common.interfaces.uow import UnitOfWork
@@ -18,9 +17,9 @@ from src.infrastructure.db.main import build_sa_engine, build_sa_session, build_
 from src.infrastructure.db.repositories.user import UserReaderImpl, UserRepoImpl
 from src.infrastructure.db.uow import SQLAlchemyUoW
 from src.infrastructure.event_bus.event_bus import EventBusImpl
-from src.infrastructure.event_bus.message_broker import MessageBroker
 from src.infrastructure.mapper.main import build_mapper
 from src.infrastructure.mediator import get_mediator
+from src.infrastructure.message_broker.interface import MessageBroker
 from src.infrastructure.message_broker.main import build_rq_channel, build_rq_channel_pool, build_rq_connection_pool
 from src.infrastructure.message_broker.message_broker import MessageBrokerImpl
 
@@ -54,7 +53,7 @@ def setup_mediator_factory(
 
 def setup_db_factories(di_builder: DiBuilder) -> None:
     di_builder.bind(bind_by_type(Dependent(build_sa_engine, scope=APP_SCOPE), AsyncEngine))
-    di_builder.bind(bind_by_type(Dependent(build_sa_session_factory, scope=APP_SCOPE), sessionmaker))
+    di_builder.bind(bind_by_type(Dependent(build_sa_session_factory, scope=APP_SCOPE), async_sessionmaker[AsyncSession]))
     di_builder.bind(bind_by_type(Dependent(build_sa_session, scope=REQUEST_SCOPE), AsyncSession))
     di_builder.bind(bind_by_type(Dependent(SQLAlchemyUoW, scope=REQUEST_SCOPE), UnitOfWork))
     di_builder.bind(bind_by_type(Dependent(UserRepoImpl, scope=REQUEST_SCOPE), UserRepo, covariant=True))

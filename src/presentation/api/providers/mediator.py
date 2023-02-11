@@ -3,6 +3,7 @@ from didiator import Mediator
 from fastapi import Depends
 
 from src.infrastructure.mediator import get_mediator
+
 from .di import get_di_state
 
 
