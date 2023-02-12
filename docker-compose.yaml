@@ -17,6 +17,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-$USER}
     volumes:
       - "user_service.postgres.data:/var/lib/postgresql/users:rw"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
 
   postgres_migration:
     container_name: user_service.postgres_migration
@@ -24,22 +30,23 @@ services:
       context: .
     restart: "on-failure"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file: .env
     networks:
       - user_service.postgres.network
     volumes:
       - "./config.toml:/app/config.toml"
       - "./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations"
-    command: ["/wait-for-it/wait-for-it.sh", "postgres:5432", "-t", "15", "--", "python", "-m", "alembic", "upgrade", "head"]
+    command: ["python", "-m", "alembic", "upgrade", "head"]
 
   rabbitmq:
     image: rabbitmq:3.11-management-alpine
     container_name: user_service.rabbitmq
     hostname: user_service.rabbitmq
     restart: unless-stopped
-#    expose:
-#      - "5672"
+    expose:
+      - "5672"
     ports:
       # AMQP protocol port
       - "127.0.0.1:5672:5672"
