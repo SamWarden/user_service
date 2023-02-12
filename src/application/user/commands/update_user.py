@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -10,6 +11,8 @@ from src.application.user import dto, validators
 from src.application.user.interfaces import UserRepo
 from src.domain.common.constants import Empty
 from src.domain.user.value_objects import UserId, Username
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -47,6 +50,8 @@ class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
         await self._user_repo.update_user(user)
         await self._mediator.publish(user.pull_events())
         await self._uow.commit()
+
+        logger.info("User updated", extra={"user": user})
 
         user_dto = self._mapper.load(user, dto.User)
         return user_dto

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncEngine, AsyncSession
 from src.application.common.interfaces.mapper import Mapper
 from src.application.common.interfaces.uow import UnitOfWork
 from src.application.user.interfaces.persistence import UserReader, UserRepo
-from src.infrastructure.constants import APP_SCOPE, REQUEST_SCOPE
+from src.infrastructure.di import DiScope
 from src.infrastructure.db.main import build_sa_engine, build_sa_session, build_sa_session_factory
 from src.infrastructure.db.repositories.user import UserReaderImpl, UserRepoImpl
 from src.infrastructure.db.uow import SQLAlchemyUoW
@@ -27,15 +27,15 @@ from src.infrastructure.message_broker.message_broker import MessageBrokerImpl
 def init_di_builder() -> DiBuilder:
     di_container = Container()
     di_executor = AsyncExecutor()
-    di_scopes = [APP_SCOPE, REQUEST_SCOPE]
+    di_scopes = [DiScope.APP, DiScope.REQUEST]
     di_builder = DiBuilderImpl(di_container, di_executor, di_scopes=di_scopes)
     return di_builder
 
 
 def setup_di_builder(di_builder: DiBuilder) -> None:
-    di_builder.bind(bind_by_type(Dependent(lambda *args: di_builder, scope=APP_SCOPE), DiBuilder))
-    di_builder.bind(bind_by_type(Dependent(build_mapper, scope=APP_SCOPE), Mapper))
-    setup_mediator_factory(di_builder, get_mediator, REQUEST_SCOPE)
+    di_builder.bind(bind_by_type(Dependent(lambda *args: di_builder, scope=DiScope.APP), DiBuilder))
+    di_builder.bind(bind_by_type(Dependent(build_mapper, scope=DiScope.APP), Mapper))
+    setup_mediator_factory(di_builder, get_mediator, DiScope.REQUEST)
     setup_db_factories(di_builder)
     setup_event_bus_factories(di_builder)
 
@@ -52,21 +52,21 @@ def setup_mediator_factory(
 
 
 def setup_db_factories(di_builder: DiBuilder) -> None:
-    di_builder.bind(bind_by_type(Dependent(build_sa_engine, scope=APP_SCOPE), AsyncEngine))
-    di_builder.bind(bind_by_type(Dependent(build_sa_session_factory, scope=APP_SCOPE), async_sessionmaker[AsyncSession]))
-    di_builder.bind(bind_by_type(Dependent(build_sa_session, scope=REQUEST_SCOPE), AsyncSession))
-    di_builder.bind(bind_by_type(Dependent(SQLAlchemyUoW, scope=REQUEST_SCOPE), UnitOfWork))
-    di_builder.bind(bind_by_type(Dependent(UserRepoImpl, scope=REQUEST_SCOPE), UserRepo, covariant=True))
-    di_builder.bind(bind_by_type(Dependent(UserReaderImpl, scope=REQUEST_SCOPE), UserReader, covariant=True))
+    di_builder.bind(bind_by_type(Dependent(build_sa_engine, scope=DiScope.APP), AsyncEngine))
+    di_builder.bind(bind_by_type(Dependent(build_sa_session_factory, scope=DiScope.APP), async_sessionmaker[AsyncSession]))
+    di_builder.bind(bind_by_type(Dependent(build_sa_session, scope=DiScope.REQUEST), AsyncSession))
+    di_builder.bind(bind_by_type(Dependent(SQLAlchemyUoW, scope=DiScope.REQUEST), UnitOfWork))
+    di_builder.bind(bind_by_type(Dependent(UserRepoImpl, scope=DiScope.REQUEST), UserRepo, covariant=True))
+    di_builder.bind(bind_by_type(Dependent(UserReaderImpl, scope=DiScope.REQUEST), UserReader, covariant=True))
 
 
 def setup_event_bus_factories(di_builder: DiBuilder) -> None:
     di_builder.bind(bind_by_type(
-        Dependent(build_rq_connection_pool, scope=APP_SCOPE), aio_pika.pool.Pool[aio_pika.abc.AbstractConnection],
+        Dependent(build_rq_connection_pool, scope=DiScope.APP), aio_pika.pool.Pool[aio_pika.abc.AbstractConnection],
     ))
     di_builder.bind(bind_by_type(
-        Dependent(build_rq_channel_pool, scope=APP_SCOPE), aio_pika.pool.Pool[aio_pika.abc.AbstractChannel],
+        Dependent(build_rq_channel_pool, scope=DiScope.APP), aio_pika.pool.Pool[aio_pika.abc.AbstractChannel],
     ))
-    di_builder.bind(bind_by_type(Dependent(build_rq_channel, scope=APP_SCOPE), aio_pika.abc.AbstractChannel))
-    di_builder.bind(bind_by_type(Dependent(MessageBrokerImpl, scope=APP_SCOPE), MessageBroker))
-    di_builder.bind(bind_by_type(Dependent(EventBusImpl, scope=APP_SCOPE), EventBusImpl))
+    di_builder.bind(bind_by_type(Dependent(build_rq_channel, scope=DiScope.APP), aio_pika.abc.AbstractChannel))
+    di_builder.bind(bind_by_type(Dependent(MessageBrokerImpl, scope=DiScope.APP), MessageBroker))
+    di_builder.bind(bind_by_type(Dependent(EventBusImpl, scope=DiScope.APP), EventBusImpl))

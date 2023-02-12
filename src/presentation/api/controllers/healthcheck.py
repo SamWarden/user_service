@@ -1,5 +1,6 @@
+from dataclasses import dataclass
+
 from fastapi import APIRouter, status
-from fastapi.responses import ORJSONResponse
 
 healthcheck_router = APIRouter(
     prefix="/healthcheck",
@@ -7,6 +8,14 @@ healthcheck_router = APIRouter(
 )
 
 
-@healthcheck_router.get("/", response_class=ORJSONResponse, status_code=status.HTTP_200_OK)
-async def create_user():
-    return {"status": "ok"}
+@dataclass(frozen=True)
+class OkStatus:
+    status: str = "ok"
+
+
+OK_STATUS = OkStatus()
+
+
+@healthcheck_router.get("/", status_code=status.HTTP_200_OK)
+async def create_user() -> OkStatus:
+    return OK_STATUS

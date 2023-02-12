@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from src.application.common.query import Query, QueryHandler
@@ -5,6 +6,8 @@ from src.application.user import dto
 from src.application.user.interfaces import UserReader
 from src.application.user.interfaces.persistence import GetUsersFilters, GetUsersOrder
 from src.domain.common.constants import Empty
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -24,6 +27,10 @@ class GetUsersHandler(QueryHandler[GetUsers, dto.Users]):
             deleted=query.deleted, offset=query.offset, limit=query.limit, order=query.order,
         ))
         users_count = await self._user_reader.get_users_count(query.deleted)
+        logger.debug("Get users", extra={
+            "users": users, "total": users_count,
+            "offset": query.offset, "limit": query.limit, "deleted": query.deleted,
+        })
         return dto.Users(
             users=users,
             total=users_count,

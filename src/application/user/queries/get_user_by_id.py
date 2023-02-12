@@ -1,9 +1,12 @@
+import logging
 from dataclasses import dataclass
 from uuid import UUID
 
 from src.application.common.query import Query, QueryHandler
 from src.application.user import dto
 from src.application.user.interfaces import UserReader
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -17,4 +20,5 @@ class GetUserByIdHandler(QueryHandler[GetUserById, dto.UserDTOs]):
 
     async def __call__(self, query: GetUserById) -> dto.UserDTOs:
         user = await self._user_reader.get_user_by_id(query.user_id)
+        logger.debug("Get use by id", extra={"user_id": query.user_id, "user": user})
         return user

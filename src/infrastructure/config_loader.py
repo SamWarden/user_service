@@ -1,11 +1,11 @@
+import os
 import tomllib
-from typing import Type, TypeVar
+from typing import TypeVar
 
 from dataclass_factory import Retort
 
-from src.infrastructure.constants import CONFIG_PATH
-
 T = TypeVar("T")
+CONFIG_PATH: str = os.getenv("CONFIG_PATH", "./config/config.toml")
 
 
 def read_toml(path: str) -> dict:

@@ -19,3 +19,7 @@ class RollbackError(UnexpectedError):
 
 class RepoError(UnexpectedError):
     pass
+
+
+class MappingError(ApplicationException):
+    pass

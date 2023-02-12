@@ -15,15 +15,10 @@ class MessageBrokerImpl(MessageBroker):
         self._channel = channel
 
     async def publish_message(
-        self,
-        message: Message,
-        routing_key: str,
-        exchange_name: str,
+        self, message: Message, routing_key: str, exchange_name: str,
     ) -> None:
         rq_message = self.build_message(message)
-        exchange = await self._get_exchange(exchange_name)
-        await exchange.publish(rq_message, routing_key=routing_key)
-        logger.info(f" [x] Sent {rq_message!r}")
+        await self._publish_message(rq_message, routing_key, exchange_name)
 
     async def declare_exchange(self, exchange_name: str) -> None:
         await self._channel.declare_exchange(exchange_name, aio_pika.ExchangeType.TOPIC)
@@ -37,6 +32,13 @@ class MessageBrokerImpl(MessageBroker):
             delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
             headers={},
         )
+
+    async def _publish_message(
+        self, rq_message: aio_pika.Message, routing_key: str, exchange_name: str,
+    ) -> None:
+        exchange = await self._get_exchange(exchange_name)
+        await exchange.publish(rq_message, routing_key=routing_key)
+        logger.debug("Message sent", extra={"rq_message": rq_message})
 
     async def _get_exchange(self, exchange_name: str) -> aio_pika.abc.AbstractExchange:
         return await self._channel.get_exchange(exchange_name, ensure=False)

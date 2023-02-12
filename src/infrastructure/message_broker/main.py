@@ -9,7 +9,7 @@ from .config import EventBusConfig
 
 
 def build_rq_connection_pool(event_bus_config: EventBusConfig) -> Pool[aio_pika.abc.AbstractConnection]:
-    rq_connection_pool = Pool(ConnectionFactory(event_bus_config.rabbitmq_uri).get_connection, max_size=10)
+    rq_connection_pool = Pool(ConnectionFactory(event_bus_config).get_connection, max_size=10)
     return rq_connection_pool
 
 

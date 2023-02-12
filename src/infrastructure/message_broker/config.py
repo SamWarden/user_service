@@ -3,4 +3,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class EventBusConfig:
-    rabbitmq_uri: str
+    host: str = "localhost"
+    port: int = 5672
+    login: str = "admin"
+    password: str = "admin"
