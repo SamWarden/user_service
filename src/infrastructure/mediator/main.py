@@ -12,14 +12,15 @@ from src.application.user.queries.get_user_by_id import GetUserById, GetUserById
 from src.application.user.queries.get_user_by_username import GetUserByUsername, GetUserByUsernameHandler
 from src.application.user.queries.get_users import GetUsers, GetUsersHandler
 from src.domain.common.events import Event
-from src.infrastructure.constants import REQUEST_SCOPE
+from src.infrastructure.di import DiScope
 from src.infrastructure.event_bus.event_handler import EventHandlerPublisher
+from src.infrastructure.log.event_handler import EventLogger
 
 
 def init_mediator(di_builder: DiBuilder) -> Mediator:
     middlewares = (
         LoggingMiddleware("mediator", level=logging.DEBUG),
-        DiMiddleware(di_builder, scopes=DiScopes(REQUEST_SCOPE)),
+        DiMiddleware(di_builder, scopes=DiScopes(DiScope.REQUEST)),
     )
     command_dispatcher = CommandDispatcherImpl(middlewares=middlewares)
     query_dispatcher = QueryDispatcherImpl(middlewares=middlewares)
@@ -36,4 +37,5 @@ def setup_mediator(mediator: Mediator) -> None:
     mediator.register_query_handler(GetUserById, GetUserByIdHandler)
     mediator.register_query_handler(GetUserByUsername, GetUserByUsernameHandler)
     mediator.register_query_handler(GetUsers, GetUsersHandler)
+    mediator.register_event_handler(Event, EventLogger)
     mediator.register_event_handler(Event, EventHandlerPublisher)

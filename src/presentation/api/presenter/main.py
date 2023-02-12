@@ -2,9 +2,11 @@ from typing import Any, Protocol, TypeVar
 
 from dataclass_factory import Retort
 
+from src.application.common.exceptions import MappingError
 from src.application.user import dto
 from src.infrastructure.mapper.converter import Converter
 from src.presentation.api.controllers import responses
+
 from .user import convert_dto_to_users_response
 
 T = TypeVar("T")
@@ -20,7 +22,10 @@ class PresenterImpl(Presenter):
         self._retort = retort
 
     def load(self, data: Any, class_: type[T]) -> T:
-        return self._retort.load(data, class_)
+        try:
+            return self._retort.load(data, class_)
+        except Exception as err:
+            raise MappingError from err
 
 
 def build_presenter() -> Presenter:

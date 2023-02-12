@@ -1,6 +1,5 @@
 import logging
 
-import structlog
 import uvicorn
 from di import ScopeState
 from didiator import Mediator
@@ -14,7 +13,7 @@ from src.presentation.api.providers import setup_providers
 
 from .config import APIConfig
 
-logger = structlog.get_logger()
+logger = logging.getLogger(__name__)
 
 
 def init_api(
@@ -32,7 +31,7 @@ def init_api(
 
 
 async def run_api(app: FastAPI, api_config: APIConfig) -> None:
-    config = uvicorn.Config(app, host=api_config.host, port=api_config.port, log_level=logging.INFO)
+    config = uvicorn.Config(app, host=api_config.host, port=api_config.port, log_level=logging.INFO, log_config=None)
     server = uvicorn.Server(config)
     logger.info("Running API")
     await server.serve()

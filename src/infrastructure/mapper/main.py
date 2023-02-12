@@ -3,6 +3,7 @@ from typing import Any, TypeVar
 from dataclass_factory import Retort
 
 from src import application, domain
+from src.application.common.exceptions import MappingError
 from src.application.common.interfaces.mapper import Mapper
 from src.infrastructure.db import models
 from src.infrastructure import event_bus
@@ -30,7 +31,10 @@ class MapperImpl(Mapper):
         self._retort = retort
 
     def load(self, data: Any, class_: type[T]) -> T:
-        return self._retort.load(data, class_)
+        try:
+            return self._retort.load(data, class_)
+        except Exception as err:
+            raise MappingError from err
 
 
 def build_mapper() -> MapperImpl:
