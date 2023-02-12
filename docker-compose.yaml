@@ -1,6 +1,35 @@
 version: "3.9"
 
 services:
+  api:
+    container_name: user_service.api
+    build:
+      context: .
+    restart: "on-failure"
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - user_service.postgres.network
+      - user_service.rabbitmq.network
+    volumes:
+      - "./config:/app/config"
+    environment:
+      - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
+    command: ["python", "-m", "src"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsSL http://localhost:5000/healthcheck/"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
   postgres_migration:
     container_name: user_service.postgres_migration
     build:
@@ -9,17 +38,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    env_file: .env
     networks:
       - user_service.postgres.network
     volumes:
-      - "./config.toml:/app/config.toml"
+      - "./config:/app/config"
       - "./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations"
     command: ["python", "-m", "alembic", "upgrade", "head"]
 
   postgres:
     container_name: user_service.postgres
     image: "postgres:15-alpine"
+    hostname: user_service.postgres
     restart: unless-stopped
     expose:
       - "5432"

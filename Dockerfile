@@ -28,6 +28,7 @@ RUN poetry install --no-dev
 
 FROM python-base as production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+RUN apt-get update && apt-get install -y curl
 
 WORKDIR app/
 COPY ./alembic.ini /app/alembic.ini
