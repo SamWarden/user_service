@@ -1,6 +1,22 @@
 version: "3.9"
 
 services:
+  postgres_migration:
+    container_name: user_service.postgres_migration
+    build:
+      context: .
+    restart: "on-failure"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    networks:
+      - user_service.postgres.network
+    volumes:
+      - "./config.toml:/app/config.toml"
+      - "./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations"
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+
   postgres:
     container_name: user_service.postgres
     image: "postgres:15-alpine"
@@ -24,22 +40,6 @@ services:
       retries: 5
       start_period: 10s
 
-  postgres_migration:
-    container_name: user_service.postgres_migration
-    build:
-      context: .
-    restart: "on-failure"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file: .env
-    networks:
-      - user_service.postgres.network
-    volumes:
-      - "./config.toml:/app/config.toml"
-      - "./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations"
-    command: ["python", "-m", "alembic", "upgrade", "head"]
-
   rabbitmq:
     image: rabbitmq:3.11-management-alpine
     container_name: user_service.rabbitmq
@@ -59,6 +59,12 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-admin}
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics check_running -q"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
 
 volumes:
   user_service.postgres.data: {}
