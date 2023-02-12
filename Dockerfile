@@ -18,8 +18,6 @@ FROM python-base as builder-base
 RUN apt-get update \
  && apt-get install -y gcc git
 
-RUN git clone https://github.com/vishnubob/wait-for-it.git
-
 WORKDIR $PYSETUP_PATH
 COPY ./pyproject.toml .
 RUN pip install --no-cache-dir --upgrade pip \
@@ -30,7 +28,7 @@ RUN poetry install --no-dev
 
 FROM python-base as production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-COPY --from=builder-base /wait-for-it /wait-for-it
+RUN apt-get update && apt-get install -y curl
 
 WORKDIR app/
 COPY ./alembic.ini /app/alembic.ini
