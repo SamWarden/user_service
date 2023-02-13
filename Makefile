@@ -26,8 +26,12 @@ run:  # Run app
 
 .PHONY: up
 up:  # Run app in docker container
-	docker compose up --build api
+	docker compose --profile api --profile grafana up --build -d
 
 .PHONY: build
 build:  # Build docker image
 	docker compose build
+
+.PHONY: migrate
+migrate:  # Run migration for postgres database
+	docker compose --profile migration up --build

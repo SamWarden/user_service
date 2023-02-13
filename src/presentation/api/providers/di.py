@@ -1,7 +1,7 @@
 from collections.abc import AsyncGenerator
 
 from di import ScopeState
-from didiator.utils.di_builder import DiBuilder
+from didiator.interface.utils.di_builder import DiBuilder
 from fastapi import Depends
 
 from src.infrastructure.di import DiScope

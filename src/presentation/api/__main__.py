@@ -4,8 +4,7 @@ import logging
 from src.application.common.interfaces.mapper import Mapper
 from src.infrastructure.config_loader import load_config
 from src.infrastructure.di import DiScope, init_di_builder, setup_di_builder
-from src.infrastructure.event_bus.event_bus import EventBusImpl
-from src.infrastructure.event_bus.main import declare_exchanges
+from src.infrastructure.event_bus.exchanges import declare_exchanges
 from src.infrastructure.mediator import init_mediator, setup_mediator
 from src.infrastructure.log import configure_logging
 from src.presentation.api.main import init_api, run_api
@@ -29,8 +28,8 @@ async def main() -> None:
         mediator = await di_builder.execute(init_mediator, DiScope.APP, state=di_state)
         setup_mediator(mediator)
 
-        event_bus = await di_builder.execute(EventBusImpl, DiScope.APP, state=di_state)
-        await declare_exchanges(event_bus)
+        async with di_builder.enter_scope(DiScope.REQUEST, state=di_state) as request_di_state:
+            await di_builder.execute(declare_exchanges, DiScope.REQUEST, state=request_di_state)
 
         mapper = await di_builder.execute(Mapper, DiScope.APP, state=di_state)
 

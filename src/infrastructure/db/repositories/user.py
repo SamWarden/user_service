@@ -99,7 +99,7 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
             self._parse_error(err, user)
 
     def _parse_error(self, err: DBAPIError, user: entities.User) -> NoReturn:
-        match err.__cause__.__cause__.constraint_name:
+        match err.__cause__.__cause__.constraint_name:  # type: ignore
             case "pk_users":
                 raise UserIdAlreadyExists(user.id.to_uuid()) from err
             case "uq_users_username":

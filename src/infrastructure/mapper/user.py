@@ -1,3 +1,5 @@
+from typing import cast
+
 from dataclass_factory.load_error import ValueLoadError
 
 from src.application.user import dto
@@ -31,7 +33,7 @@ def convert_deleted_user_entity_to_dto(user: entities.User) -> dto.DeletedUser:
 def convert_user_entity_to_db_model(user: entities.User) -> models.User:
     return models.User(
         id=user.id.to_uuid(),
-        username=str(user.username),
+        username=str(user.username) if user.username is not None else None,
         first_name=user.first_name,
         last_name=user.last_name,
         deleted=user.deleted,
@@ -41,7 +43,7 @@ def convert_user_entity_to_db_model(user: entities.User) -> models.User:
 def convert_db_model_to_user_entity(user: models.User) -> entities.User:
     return entities.User(
         id=vo.UserId(user.id),
-        username=vo.Username(user.username),
+        username=vo.Username(user.username) if user.username is not None else None,
         first_name=user.first_name,
         last_name=user.last_name,
         deleted=user.deleted,
@@ -54,7 +56,7 @@ def convert_db_model_to_user_dto(user: models.User) -> dto.User:
 
     return dto.User(
         id=user.id,
-        username=user.username,
+        username=cast(user.username, str),
         first_name=user.first_name,
         last_name=user.last_name,
     )

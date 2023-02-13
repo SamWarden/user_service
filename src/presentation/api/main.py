@@ -3,7 +3,7 @@ import logging
 import uvicorn
 from di import ScopeState
 from didiator import Mediator
-from didiator.utils.di_builder import DiBuilder
+from didiator.interface.utils.di_builder import DiBuilder
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
