@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   api:
+    profiles: [ "api" ]
     container_name: user_service.api
     build:
       context: .
@@ -19,7 +20,7 @@ services:
       - user_service.postgres.network
       - user_service.rabbitmq.network
     volumes:
-      - "./config:/app/config"
+      - ./config:/app/config:ro
     environment:
       - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
     command: ["python", "-m", "src"]
@@ -31,6 +32,7 @@ services:
       start_period: 10s
 
   postgres_migration:
+    profiles: [ "migration" ]
     container_name: user_service.postgres_migration
     build:
       context: .
@@ -41,11 +43,15 @@ services:
     networks:
       - user_service.postgres.network
     volumes:
-      - "./config:/app/config"
-      - "./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations"
+      - ./config:/app/config:ro
+      - ./alembic.ini:/app/alembic.ini:ro
+      - ./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations:ro
+    environment:
+      - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
     command: ["python", "-m", "alembic", "upgrade", "head"]
 
   postgres:
+    profiles: [ "api", "migration" ]
     container_name: user_service.postgres
     image: "postgres:15-alpine"
     hostname: user_service.postgres
@@ -61,7 +67,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-$USER}
       POSTGRES_DB: ${POSTGRES_DB:-$USER}
     volumes:
-      - "user_service.postgres.data:/var/lib/postgresql/users:rw"
+      - user_service.postgres.data:/var/lib/postgresql/users:rw
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 10s
@@ -70,6 +76,7 @@ services:
       start_period: 10s
 
   rabbitmq:
+    profiles: [ "api" ]
     image: rabbitmq:3.11-management-alpine
     container_name: user_service.rabbitmq
     hostname: user_service.rabbitmq
@@ -84,7 +91,7 @@ services:
     networks:
       - user_service.rabbitmq.network
     volumes:
-      - user_service.rabbitmq.data:/var/lib/rabbitmq/
+      - user_service.rabbitmq.data:/var/lib/rabbitmq/:rw
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-admin}
@@ -95,13 +102,73 @@ services:
       retries: 5
       start_period: 10s
 
+  grafana:
+    profiles: [ "grafana" ]
+    image: grafana/grafana:9.3.6
+    container_name: user_service.grafana
+    hostname: user_service.grafana
+    restart: unless-stopped
+    expose:
+      - "3000"
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - user_service.grafana.network
+    volumes:
+      - user_service.grafana.data:/var/lib/grafana:rw
+      - ./grafana/provisioning:/etc/grafana/provisioning:rw
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - VIRTUAL_HOST=user_service.grafana
+      - NETWORK_ACCESS=internal
+      - VIRTUAL_PORT=3000
+
+  loki:
+    profiles: [ "grafana" ]
+    image: grafana/loki:2.7.3
+    container_name: user_service.loki
+    hostname: user_service.loki
+    expose:
+      - "3100"
+    volumes:
+      - ./loki/config.yaml:/etc/loki/config.yaml:ro
+      - user_service.loki.data:/tmp/:rw
+    command: -config.file=/etc/loki/config.yaml
+    restart: unless-stopped
+    networks:
+      - user_service.grafana.network
+
+  vector:
+    profiles: [ "grafana" ]
+    image: timberio/vector:0.27.0-alpine
+    container_name: user_service.vector
+    hostname: user_service.vector
+    restart: unless-stopped
+    expose:
+      - "8383"
+    networks:
+      - user_service.grafana.network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./vector/vector.toml:/etc/vector/vector.toml:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
 volumes:
   user_service.postgres.data: {}
   user_service.rabbitmq.data: {}
+  user_service.grafana.data: {}
+  user_service.loki.data: {}
 
 networks:
   user_service.postgres.network: {}
   user_service.rabbitmq.network: {}
+  user_service.grafana.network: {}
+
 #  reverse-proxy:
 #    external:
 #      name: nginx-reverse-proxy
