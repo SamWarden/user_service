@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "user_service"
-version = "0.1.0"
+version = "1.0.0"
 description = "User service example"
 authors = [
     "SamWarden <SamWardenSad@gmail.com>",
@@ -15,15 +15,14 @@ repository = "https://github.com/SamWarden/user_service"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-sqlalchemy = "^2.0.0rc2"
+sqlalchemy = "^2.0.3"
 structlog = "^22.3.0"
-fastapi = "^0.89.1"
-orjson = "^3.8.3"
+fastapi = "^0.91.0"
+orjson = "^3.8.6"
 dataclass-factory = {git = "https://github.com/reagento/dataclass-factory", rev = "688efa01cb08f3ea574e9e68661786339f61f10e"}
-alembic = "^1.9.1"
-rich = "^13.0.0"
+alembic = "^1.9.3"
+rich = "^13.3.1"
 asyncpg = "^0.27.0"
-redis = "^4.4.0"
 uvicorn = "^0.20.0"
 didiator = {version = "^0.3.1", extras = ["di"]}
 uuid6 = "^2022.10.25"
@@ -33,15 +32,15 @@ aio-pika = "^8.3.0"
 optional = true
 
 [tool.poetry.group.test.dependencies]
-pytest = "^7.2.0"
+pytest = "^7.2.1"
 pytest-asyncio = "^0.20.3"
 
 [tool.poetry.group.lint]
 optional = true
 
 [tool.poetry.group.lint.dependencies]
-pylint = "^2.15.9"
-mypy = "^0.991"
+pylint = "^2.16.1"
+mypy = "^1.0.0"
 flake8 = "^6.0.0"
 
 [build-system]

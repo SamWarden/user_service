@@ -5,6 +5,7 @@ from di import ScopeState
 from didiator import Mediator
 from didiator.utils.di_builder import DiBuilder
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 
 from src.application.common.interfaces.mapper import Mapper
 from src.presentation.api.controllers import setup_controllers
@@ -23,7 +24,7 @@ def init_api(
     di_state: ScopeState | None = None,
 ) -> FastAPI:
     logger.debug("Initialize API")
-    app = FastAPI()
+    app = FastAPI(debug=True, title="User service", version="1.0.0", default_response_class=ORJSONResponse)
     setup_providers(app, mediator, mapper, di_builder, di_state)
     setup_middlewares(app)
     setup_controllers(app)
