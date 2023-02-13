@@ -22,9 +22,10 @@ def init_api(
     mapper: Mapper,
     di_builder: DiBuilder,
     di_state: ScopeState | None = None,
+    debug: bool = __debug__,
 ) -> FastAPI:
     logger.debug("Initialize API")
-    app = FastAPI(debug=True, title="User service", version="1.0.0", default_response_class=ORJSONResponse)
+    app = FastAPI(debug=debug, title="User service", version="1.0.0", default_response_class=ORJSONResponse)
     setup_providers(app, mediator, mapper, di_builder, di_state)
     setup_middlewares(app)
     setup_controllers(app)

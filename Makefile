@@ -1,5 +1,6 @@
 py := poetry run
 package_dir := src
+tests_dir := tests
 
 .PHONY: help
 help:
@@ -17,4 +18,16 @@ lint: ## Lint code with flake8, pylint, mypy
 
 .PHONY: test
 test: ## Run tests
-	$(py) pytest $(package_dir)
+	$(py) pytest $(tests_dir)
+
+.PHONY: run
+run:  # Run app
+	$(py) python -m $(package_dir)
+
+.PHONY: up
+up:  # Run app in docker container
+	docker compose up --build api
+
+.PHONY: build
+build:  # Build docker image
+	docker compose build

@@ -5,6 +5,7 @@ from starlette.responses import RedirectResponse
 default_router = APIRouter(
     prefix="",
     tags=["default"],
+    include_in_schema=False,
 )
 
 

@@ -29,4 +29,7 @@ async def exception_handler(request: Request, err: Exception) -> ORJSONResponse:
             return ORJSONResponse(ErrorResult(message=err.message, data=err), status_code=status.HTTP_409_CONFLICT)
         case _:
             logger.exception("Unknown error occurred", exc_info=err, extra={"error": err})
-            return ORJSONResponse(ErrorResult(message="Unknown server error has occurred", data=err), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return ORJSONResponse(
+                ErrorResult(message="Unknown server error has occurred", data=err),
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
