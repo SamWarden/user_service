@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
 import pytest
-from dataclass_factory import Retort
+from dataclass_factory import dumper, loader, Omitted, Retort
 from dataclass_factory.load_error import TypeLoadError
 
-from src.infrastructure.mapper._converter import Converter
+from src.infrastructure.mapper.converter import Converter
 
 
 @dataclass
@@ -157,7 +157,7 @@ def test_convert_order_owner_entity_to_dto():
     ) == OrderOwnerDTO("1", "Jon", [OrderDTO(1, 100), OrderDTO(2, 200)])
 
 
-def test_convert_model_to_dto():
+def test_convert_model_to_user_dto():
     retort = Retort(recipe=(
         Converter(User, UserDTO, convert_user_entity_to_dto),
         Converter(UserModel, UserDTO, convert_user_model_to_dto),

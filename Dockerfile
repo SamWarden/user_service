@@ -31,6 +31,5 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 RUN apt-get update && apt-get install -y curl
 
 WORKDIR app/
-COPY ./alembic.ini /app/alembic.ini
 COPY ./src /app/src
-CMD ["python", "-m", "src.presentation.api"]
+CMD ["python", "-Om", "src"]

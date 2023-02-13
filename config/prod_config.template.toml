@@ -1,6 +1,7 @@
 [api]
 host = "0.0.0.0"
 port = 5000
+debug = false
 
 [db]
 host = "user_service.postgres"

@@ -1,0 +1,25 @@
+[sources.docker]
+type = "docker_logs"
+docker_host = "/var/run/docker.sock"
+include_containers = ["user_service.api", "user_service.postgres", "user_service.rabbitmq"]
+# include_images = [ "user_service.api" ]
+# include_labels = [ "com.example.vendor=user_service." ]
+
+[transforms.json]
+type = "remap"
+inputs = ["docker"]
+drop_on_error = true
+source = ".message = object!(parse_json(.message) ?? {})"
+
+[sinks.console]
+type = "console"
+inputs = ["json"]
+encoding.codec = "json"
+
+[sinks.loki_sync_id]
+type = "loki"
+inputs = ["json"]
+encoding.codec = "json"
+labels.event = "log"
+labels.container_name = "{{container_name}}"
+endpoint = "http://user_service.loki:3100"
