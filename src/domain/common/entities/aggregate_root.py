@@ -20,6 +20,6 @@ class AggregateRoot(Entity, ABC):
         self._events.clear()
 
     def pull_events(self) -> list[Event]:
-        events = self.get_events()
+        events = self.get_events().copy()
         self.clear_events()
         return events
