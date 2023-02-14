@@ -27,6 +27,7 @@ uvicorn = "^0.20.0"
 didiator = {version = "^0.3.1", extras = ["di"]}
 uuid6 = "^2022.10.25"
 aio-pika = "^8.3.0"
+uvloop = "^0.17.0"
 
 [tool.poetry.group.test]
 optional = true

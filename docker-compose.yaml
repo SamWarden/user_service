@@ -82,11 +82,12 @@ services:
     hostname: user_service.rabbitmq
     restart: unless-stopped
     expose:
-      - "5672"
-    ports:
       # AMQP protocol port
-      - "127.0.0.1:5672:5672"
+      - "5672"
       # HTTP management UI
+      - "15672"
+    ports:
+      - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
     networks:
       - user_service.rabbitmq.network
@@ -168,7 +169,3 @@ networks:
   user_service.postgres.network: {}
   user_service.rabbitmq.network: {}
   user_service.grafana.network: {}
-
-#  reverse-proxy:
-#    external:
-#      name: nginx-reverse-proxy

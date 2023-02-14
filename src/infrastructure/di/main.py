@@ -67,6 +67,6 @@ def setup_event_bus_factories(di_builder: DiBuilder) -> None:
     di_builder.bind(bind_by_type(
         Dependent(build_rq_channel_pool, scope=DiScope.APP), aio_pika.pool.Pool[aio_pika.abc.AbstractChannel],
     ))
-    di_builder.bind(bind_by_type(Dependent(build_rq_channel, scope=DiScope.APP), aio_pika.abc.AbstractChannel))
-    di_builder.bind(bind_by_type(Dependent(MessageBrokerImpl, scope=DiScope.APP), MessageBroker))
-    di_builder.bind(bind_by_type(Dependent(EventBusImpl, scope=DiScope.APP), EventBusImpl))
+    di_builder.bind(bind_by_type(Dependent(build_rq_channel, scope=DiScope.REQUEST), aio_pika.abc.AbstractChannel))
+    di_builder.bind(bind_by_type(Dependent(MessageBrokerImpl, scope=DiScope.REQUEST), MessageBroker))
+    di_builder.bind(bind_by_type(Dependent(EventBusImpl, scope=DiScope.REQUEST), EventBusImpl))

@@ -13,7 +13,7 @@ Func = Callable[Param, ReturnType]
 
 def exception_mapper(func: Func) -> Func:
     @wraps(func)
-    async def wrapped(*args: Param.args, **kwargs: Param.kwargs):
+    async def wrapped(*args: Param.args, **kwargs: Param.kwargs) -> ReturnType:
         try:
             return await func(*args, **kwargs)
         except SQLAlchemyError as err:
