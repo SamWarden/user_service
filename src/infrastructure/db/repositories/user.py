@@ -38,7 +38,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
         return self._mapper.load(user, dto.User)
 
     @exception_mapper
-    async def get_users(self, filters: GetUsersFilters) -> tuple[dto.UserDTOs, ...]:
+    async def get_users(self, filters: GetUsersFilters) -> list[dto.UserDTOs]:
         query = select(User)
 
         if filters.order is GetUsersOrder.DESC:
@@ -57,8 +57,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
         result = await self._session.scalars(query)
         users = result.all()
 
-        return tuple(self._mapper.load(users, list[dto.UserDTOs]))
-        # return self._mapper.load(users, tuple[dto.UserDTOs, ...])
+        return self._mapper.load(users, list[dto.UserDTOs])
 
     async def get_users_count(self, deleted: bool | Empty = Empty.UNSET) -> int:
         query = select(func.count(User.id))
