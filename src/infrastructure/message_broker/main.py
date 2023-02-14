@@ -29,3 +29,12 @@ async def build_rq_channel(
 ) -> AsyncGenerator[aio_pika.abc.AbstractChannel, None]:
     async with rq_channel_pool.acquire() as channel:
         yield channel
+        channel.transaction()
+
+
+async def build_rq_transaction(
+    rq_channel: aio_pika.abc.AbstractChannel,
+) -> aio_pika.abc.AbstractTransaction:
+    rq_transaction = rq_channel.transaction()
+    await rq_transaction.select()
+    return rq_transaction

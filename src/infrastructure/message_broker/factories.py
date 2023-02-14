@@ -24,4 +24,4 @@ class ChannelFactory:
 
     async def get_channel(self) -> aio_pika.abc.AbstractChannel:
         async with self._rq_connection_pool.acquire() as connection:
-            return await connection.channel()
+            return await connection.channel(publisher_confirms=False)
