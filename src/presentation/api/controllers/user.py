@@ -1,3 +1,4 @@
+from typing import Union
 from uuid import UUID
 
 from didiator import CommandMediator, QueryMediator
@@ -31,10 +32,10 @@ user_router = APIRouter(
     responses={
         status.HTTP_201_CREATED: {"model": dto.User},
         status.HTTP_400_BAD_REQUEST: {
-            "model": ErrorResult[TooLongUsername | EmptyUsername | WrongUsernameFormat],  # type: ignore
+            "model": ErrorResult[Union[TooLongUsername, EmptyUsername, WrongUsernameFormat]],
         },
         status.HTTP_409_CONFLICT: {
-            "model": ErrorResult[UsernameAlreadyExists | UserIdAlreadyExists],  # type: ignore
+            "model": ErrorResult[Union[UsernameAlreadyExists, UserIdAlreadyExists]],
         }
     },
     status_code=status.HTTP_201_CREATED,
@@ -101,7 +102,7 @@ async def get_users(
     "/{user_id}",
     responses={
         status.HTTP_200_OK: {"model": dto.User},
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorResult[UserIdNotExist | UsernameAlreadyExists]},  # type: ignore
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResult[Union[UserIdNotExist, UsernameAlreadyExists]]},
         status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
     },
 )

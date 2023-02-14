@@ -13,13 +13,13 @@ class AggregateRoot(Entity, ABC):
     def record_event(self, event: Event) -> None:
         self._events.append(event)
 
-    def get_events(self) -> tuple[Event, ...]:
-        return tuple(self._events)
+    def get_events(self) -> list[Event]:
+        return self._events
 
     def clear_events(self) -> None:
         self._events.clear()
 
-    def pull_events(self) -> tuple[Event, ...]:
+    def pull_events(self) -> list[Event]:
         events = self.get_events()
         self.clear_events()
         return events

@@ -9,7 +9,7 @@ UserDTOs = User | DeletedUser
 
 @dataclass(frozen=True)
 class Users:
-    users: tuple[UserDTOs, ...]
+    users: list[UserDTOs]
     total: int
     offset: int | Empty = Empty.UNSET
     limit: int | Empty = Empty.UNSET

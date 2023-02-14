@@ -27,7 +27,7 @@ class UserReader(Protocol):
     async def get_user_by_username(self, username: str) -> dto.User:
         raise NotImplementedError
 
-    async def get_users(self, filters: GetUsersFilters) -> tuple[dto.UserDTOs, ...]:
+    async def get_users(self, filters: GetUsersFilters) -> list[dto.UserDTOs]:
         raise NotImplementedError
 
     async def get_users_count(self, deleted: bool | Empty = Empty.UNSET) -> int:
