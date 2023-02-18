@@ -2,7 +2,7 @@ import os
 import tomllib
 from typing import TypeVar
 
-from dataclass_factory import Retort
+from adaptix import Retort
 
 T = TypeVar("T")
 CONFIG_PATH: str = os.getenv("CONFIG_PATH", "./config/config.toml")

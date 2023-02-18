@@ -28,6 +28,10 @@ run:  # Run app
 up:  # Run app in docker container
 	docker compose --profile api --profile grafana up --build -d
 
+.PHONY: down
+down:  # Stop docker containers
+	docker compose --profile api --profile grafana down
+
 .PHONY: build
 build:  # Build docker image
 	docker compose build

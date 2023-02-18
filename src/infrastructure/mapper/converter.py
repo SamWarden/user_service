@@ -1,8 +1,8 @@
 from typing import Any, Callable, Generic, TypeVar
 
-from dataclass_factory import Loader, Mediator, Request
-from dataclass_factory._internal.provider import LoaderProvider, LoaderRequest
-from dataclass_factory._internal.provider.request_filtering import ExactOriginRC
+from adaptix import Loader, Mediator, Request
+from adaptix._internal.provider import LoaderProvider, LoaderRequest
+from adaptix._internal.provider.request_filtering import ExactOriginRC
 
 FromModel = TypeVar("FromModel", bound=Any)
 ToModel = TypeVar("ToModel", bound=Any)

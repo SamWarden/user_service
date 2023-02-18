@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 import pytest
-from dataclass_factory import dumper, loader, Omitted, Retort
-from dataclass_factory.load_error import TypeLoadError
+from adaptix import dumper, loader, Omitted, Retort
+from adaptix.load_error import TypeLoadError
 
 from src.infrastructure.mapper.converter import Converter
 

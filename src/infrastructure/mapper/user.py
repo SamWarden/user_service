@@ -1,6 +1,6 @@
 from typing import cast
 
-from dataclass_factory.load_error import ValueLoadError
+from adaptix.load_error import ValueLoadError
 
 from src.application.user import dto
 from src.domain.user import entities, value_objects as vo

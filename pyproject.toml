@@ -19,7 +19,6 @@ sqlalchemy = "^2.0.3"
 structlog = "^22.3.0"
 fastapi = "^0.91.0"
 orjson = "^3.8.6"
-dataclass-factory = {git = "https://github.com/reagento/dataclass-factory", rev = "688efa01cb08f3ea574e9e68661786339f61f10e"}
 alembic = "^1.9.3"
 rich = "^13.3.1"
 asyncpg = "^0.27.0"
@@ -28,6 +27,7 @@ didiator = {version = "^0.3.1", extras = ["di"]}
 uuid6 = "^2022.10.25"
 aio-pika = "^8.3.0"
 uvloop = "^0.17.0"
+adaptix = "^3.0.0a1"
 
 [tool.poetry.group.test]
 optional = true

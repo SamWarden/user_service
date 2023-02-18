@@ -1,6 +1,6 @@
 from typing import Any, TypeVar
 
-from dataclass_factory import Retort
+from adaptix import Retort
 
 from src import application, domain
 from src.application.common.exceptions import MappingError
