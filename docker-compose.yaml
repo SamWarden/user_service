@@ -6,7 +6,7 @@ services:
     container_name: user_service.api
     build:
       context: .
-    restart: "on-failure"
+    restart: unless-stopped
     expose:
       - "5000"
     ports:
@@ -36,7 +36,7 @@ services:
     container_name: user_service.postgres_migration
     build:
       context: .
-    restart: "on-failure"
+    restart: on-failure
     depends_on:
       postgres:
         condition: service_healthy
