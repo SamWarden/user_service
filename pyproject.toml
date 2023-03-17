@@ -15,17 +15,17 @@ repository = "https://github.com/SamWarden/user_service"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-sqlalchemy = "^2.0.3"
+sqlalchemy = "^2.0.6"
 structlog = "^22.3.0"
-fastapi = "^0.91.0"
-orjson = "^3.8.6"
-alembic = "^1.9.3"
+fastapi = "^0.94.1"
+orjson = "^3.8.7"
+alembic = "^1.10.2"
 rich = "^13.3.1"
 asyncpg = "^0.27.0"
 uvicorn = "^0.20.0"
 didiator = {version = "^0.3.1", extras = ["di"]}
 uuid6 = "^2022.10.25"
-aio-pika = "^8.3.0"
+aio-pika = "^9.0.5"
 uvloop = "^0.17.0"
 adaptix = "^3.0.0a1"
 
@@ -33,15 +33,15 @@ adaptix = "^3.0.0a1"
 optional = true
 
 [tool.poetry.group.test.dependencies]
-pytest = "^7.2.1"
+pytest = "^7.2.2"
 pytest-asyncio = "^0.20.3"
 
 [tool.poetry.group.lint]
 optional = true
 
 [tool.poetry.group.lint.dependencies]
-pylint = "^2.16.1"
-mypy = "^1.0.0"
+pylint = "^2.17.0"
+mypy = "^1.1.1"
 flake8 = "^6.0.0"
 
 [build-system]
