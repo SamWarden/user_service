@@ -9,7 +9,7 @@ maintainers = [
     "SamWarden <SamWardenSad@gmail.com>",
 ]
 license = "MIT"
-readme = "README.rst"
+readme = "README.md"
 homepage = "https://github.com/SamWarden/user_service"
 repository = "https://github.com/SamWarden/user_service"
 
