@@ -10,6 +10,8 @@ from src.application.user.commands import (
     CreateUserHandler,
     DeleteUser,
     DeleteUserHandler,
+    SetUserFullName,
+    SetUserFullNameHandler,
     SetUserUsername,
     SetUserUsernameHandler,
 )
@@ -38,6 +40,7 @@ def init_mediator(di_builder: DiBuilder) -> Mediator:
 def setup_mediator(mediator: Mediator) -> None:
     mediator.register_command_handler(CreateUser, CreateUserHandler)
     mediator.register_command_handler(SetUserUsername, SetUserUsernameHandler)
+    mediator.register_command_handler(SetUserFullName, SetUserFullNameHandler)
     mediator.register_command_handler(DeleteUser, DeleteUserHandler)
     mediator.register_query_handler(GetUserById, GetUserByIdHandler)
     mediator.register_query_handler(GetUserByUsername, GetUserByUsernameHandler)

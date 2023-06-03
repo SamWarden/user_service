@@ -5,7 +5,7 @@ from didiator import CommandMediator, QueryMediator
 from fastapi import APIRouter, Depends, Query, status
 
 from src.application.user import dto
-from src.application.user.commands import CreateUser, DeleteUser
+from src.application.user.commands import CreateUser, DeleteUser, SetUserFullName
 from src.application.user.commands.set_user_username import SetUserUsername
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.application.user.interfaces.persistence import GetUsersOrder
@@ -97,8 +97,8 @@ async def get_users(
     return convert_dto_to_users_response(users)
 
 
-@user_router.patch(
-    "/{user_id}",
+@user_router.post(
+    "/{user_id}/username",
     responses={
         status.HTTP_200_OK: {"model": dto.User},
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResult[Union[UserIdNotExist, UsernameAlreadyExists]]},
@@ -112,6 +112,29 @@ async def set_user_username(
 ) -> dto.User:
     set_user_username_command = SetUserUsername(user_id=user_id, username=set_user_username_data.username)
     user = await mediator.send(set_user_username_command)
+    return user
+
+
+@user_router.post(
+    "/{user_id}/full-name",
+    responses={
+        status.HTTP_200_OK: {"model": dto.User},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResult[Union[UserIdNotExist]]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
+    },
+)
+async def set_user_full_name(
+    user_id: UUID,
+    set_user_full_name_data: requests.SetUserFullNameData,
+    mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
+) -> dto.User:
+    set_user_full_name_command = SetUserFullName(
+        user_id=user_id,
+        first_name=set_user_full_name_data.first_name,
+        last_name=set_user_full_name_data.last_name,
+        middle_name=set_user_full_name_data.middle_name,
+    )
+    user = await mediator.send(set_user_full_name_command)
     return user
 
 
