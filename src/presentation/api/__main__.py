@@ -30,7 +30,7 @@ async def main() -> None:
         async with di_builder.enter_scope(DiScope.REQUEST, state=di_state) as request_di_state:
             await di_builder.execute(declare_exchanges, DiScope.REQUEST, state=request_di_state)
 
-        app = init_api(mediator, di_builder, di_state)
+        app = init_api(mediator, di_builder, di_state, config.api.debug)
         await run_api(app, config.api)
 
 

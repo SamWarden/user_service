@@ -23,7 +23,7 @@ services:
       - ./config:/app/config:ro
     environment:
       - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
-    command: ["python", "-m", "src"]
+    command: ["python", "-Om", "src"]
     healthcheck:
       test: ["CMD-SHELL", "curl -fsSL http://localhost:5000/healthcheck/"]
       interval: 10s
