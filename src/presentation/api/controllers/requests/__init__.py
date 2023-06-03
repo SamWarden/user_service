@@ -1,3 +1,3 @@
-from .user import UpdateUserData
+from .user import SetUserUsernameData
 
-__all__ = ("UpdateUserData",)
+__all__ = ("SetUserUsernameData",)

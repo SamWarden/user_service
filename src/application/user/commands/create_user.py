@@ -10,7 +10,7 @@ from src.application.user import dto
 from src.application.user.converters import convert_active_user_entity_to_dto
 from src.application.user.interfaces import UserRepo
 from src.domain.user.entities import User
-from src.domain.user.value_objects import UserId, Username
+from src.domain.user.value_objects import FullName, UserId, Username
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,8 @@ class CreateUser(Command[dto.User]):
     user_id: UUID
     username: str
     first_name: str
-    last_name: str | None
+    last_name: str
+    middle_name: str | None
 
 
 class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
@@ -38,8 +39,11 @@ class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
         user = User.create(
             UserId(command.user_id),
             Username(command.username),
-            command.first_name,
-            command.last_name,
+            FullName(
+                command.first_name,
+                command.last_name,
+                command.middle_name,
+            ),
         )
         await self._user_repo.add_user(user)
         await self._mediator.publish(user.pull_events())

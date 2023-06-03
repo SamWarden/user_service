@@ -10,11 +10,12 @@ class User(DTO):
     id: UUID
     username: str
     first_name: str
-    last_name: str | None
+    last_name: str
+    middle_name: str | None
     deleted: Literal[False] = field(default=False, init=False)
 
     @property
     def full_name(self) -> str:
-        if self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        return self.first_name
+        if self.middle_name:
+            return f"{self.first_name} {self.middle_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}"

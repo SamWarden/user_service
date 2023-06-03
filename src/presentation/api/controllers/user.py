@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Annotated, Union
 from uuid import UUID
 
 from didiator import CommandMediator, QueryMediator
@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query, status
 
 from src.application.user import dto
 from src.application.user.commands import CreateUser, DeleteUser
-from src.application.user.commands.update_user import UpdateUser
+from src.application.user.commands.set_user_username import SetUserUsername
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.application.user.interfaces.persistence import GetUsersOrder
 from src.application.user.queries import GetUserById, GetUserByUsername, GetUsers
@@ -15,7 +15,7 @@ from src.domain.user.exceptions import UserIsDeleted
 from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.presentation.api.controllers import requests, responses
 from src.presentation.api.controllers.responses import ErrorResult
-from src.presentation.api.converters import convert_dto_to_users_response, convert_request_to_update_user_command
+from src.presentation.api.converters import convert_dto_to_users_response
 from src.presentation.api.providers.stub import Stub
 
 user_router = APIRouter(
@@ -39,7 +39,7 @@ user_router = APIRouter(
 )
 async def create_user(
     create_user_command: CreateUser,
-    mediator: CommandMediator = Depends(Stub(CommandMediator)),
+    mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
 ) -> dto.User:
     user = await mediator.send(create_user_command)
     return user
@@ -54,7 +54,7 @@ async def create_user(
 )
 async def get_user_by_username(
     username: str,
-    mediator: QueryMediator = Depends(Stub(QueryMediator)),
+    mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
 ) -> dto.User:
     user = await mediator.query(GetUserByUsername(username=username))
     return user
@@ -69,7 +69,7 @@ async def get_user_by_username(
 )
 async def get_user_by_id(
     user_id: UUID,
-    mediator: QueryMediator = Depends(Stub(QueryMediator)),
+    mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
 ) -> dto.UserDTOs:
     user = await mediator.query(GetUserById(user_id=user_id))
     return user
@@ -80,11 +80,11 @@ async def get_user_by_id(
     description="Return all users",
 )
 async def get_users(
+    mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
     deleted: bool | None = None,
-    offset: int = Query(0, ge=0),
-    limit: int = Query(1000, ge=0, le=1000),
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=0, le=1000)] = 1000,
     order: GetUsersOrder = GetUsersOrder.ASC,
-    mediator: QueryMediator = Depends(Stub(QueryMediator)),
 ) -> responses.Users:
     users = await mediator.query(
         GetUsers(
@@ -105,13 +105,13 @@ async def get_users(
         status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
     },
 )
-async def update_user(
+async def set_user_username(
     user_id: UUID,
-    update_user_data: requests.UpdateUserData,
-    mediator: CommandMediator = Depends(Stub(CommandMediator)),
+    set_user_username_data: requests.SetUserUsernameData,
+    mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
 ) -> dto.User:
-    user_data = convert_request_to_update_user_command(update_user_data)
-    user = await mediator.send(UpdateUser(user_id=user_id, user_data=user_data))
+    set_user_username_command = SetUserUsername(user_id=user_id, username=set_user_username_data.username)
+    user = await mediator.send(set_user_username_command)
     return user
 
 
@@ -125,7 +125,7 @@ async def update_user(
 )
 async def delete_user(
     user_id: UUID,
-    mediator: CommandMediator = Depends(Stub(CommandMediator)),
+    mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
 ) -> dto.DeletedUser:
     deleted_user = await mediator.send(DeleteUser(user_id=user_id))
     return deleted_user

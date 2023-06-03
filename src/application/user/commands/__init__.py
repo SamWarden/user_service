@@ -1,12 +1,12 @@
 from .create_user import CreateUser, CreateUserHandler
 from .delete_user import DeleteUser, DeleteUserHandler
-from .update_user import UpdateUser, UpdateUserHandler
+from .set_user_username import SetUserUsername, SetUserUsernameHandler
 
 __all__ = (
     "CreateUser",
     "CreateUserHandler",
-    "UpdateUser",
-    "UpdateUserHandler",
+    "SetUserUsername",
+    "SetUserUsernameHandler",
     "DeleteUser",
     "DeleteUserHandler",
 )

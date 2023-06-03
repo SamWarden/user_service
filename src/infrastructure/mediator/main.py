@@ -10,8 +10,8 @@ from src.application.user.commands import (
     CreateUserHandler,
     DeleteUser,
     DeleteUserHandler,
-    UpdateUser,
-    UpdateUserHandler,
+    SetUserUsername,
+    SetUserUsernameHandler,
 )
 from src.application.user.queries.get_user_by_id import GetUserById, GetUserByIdHandler
 from src.application.user.queries.get_user_by_username import GetUserByUsername, GetUserByUsernameHandler
@@ -37,7 +37,7 @@ def init_mediator(di_builder: DiBuilder) -> Mediator:
 
 def setup_mediator(mediator: Mediator) -> None:
     mediator.register_command_handler(CreateUser, CreateUserHandler)
-    mediator.register_command_handler(UpdateUser, UpdateUserHandler)
+    mediator.register_command_handler(SetUserUsername, SetUserUsernameHandler)
     mediator.register_command_handler(DeleteUser, DeleteUserHandler)
     mediator.register_query_handler(GetUserById, GetUserByIdHandler)
     mediator.register_query_handler(GetUserByUsername, GetUserByUsernameHandler)

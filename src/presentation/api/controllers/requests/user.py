@@ -1,7 +1,5 @@
-from typing import TypedDict
+from pydantic import BaseModel
 
 
-class UpdateUserData(TypedDict, total=False):
+class SetUserUsernameData(BaseModel):
     username: str
-    first_name: str
-    last_name: str | None

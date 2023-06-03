@@ -5,8 +5,8 @@ from src.domain.common.events.event import Event
 
 
 @dataclasses.dataclass(frozen=True)
-class UserUpdated(Event):
+class FullNameUpdated(Event):
     user_id: UUID
-    username: str
     first_name: str
-    last_name: str | None
+    last_name: str
+    middle_name: str | None

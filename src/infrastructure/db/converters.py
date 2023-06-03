@@ -10,18 +10,23 @@ def convert_user_entity_to_db_model(user: entities.User) -> models.User:
     return models.User(
         id=user.id.to_uuid(),
         username=str(user.username) if user.username is not None else None,
-        first_name=user.first_name,
-        last_name=user.last_name,
+        first_name=user.full_name.first_name,
+        last_name=user.full_name.last_name,
+        middle_name=user.full_name.middle_name,
         deleted=user.deleted,
     )
 
 
 def convert_db_model_to_user_entity(user: models.User) -> entities.User:
+    full_name = vo.FullName(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        middle_name=user.middle_name,
+    )
     return entities.User(
         id=vo.UserId(user.id),
         username=vo.Username(user.username) if user.username is not None else None,
-        first_name=user.first_name,
-        last_name=user.last_name,
+        full_name=full_name,
         deleted=user.deleted,
     )
 
@@ -35,6 +40,7 @@ def convert_db_model_to_active_user_dto(user: models.User) -> dto.User:
         username=cast(str, user.username),
         first_name=user.first_name,
         last_name=user.last_name,
+        middle_name=user.middle_name,
     )
 
 
@@ -46,6 +52,7 @@ def convert_db_model_to_deleted_user_dto(user: models.User) -> dto.DeletedUser:
         id=user.id,
         first_name=user.first_name,
         last_name=user.last_name,
+        middle_name=user.middle_name,
     )
 
 
