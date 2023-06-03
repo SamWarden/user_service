@@ -15,7 +15,7 @@ class EventHandlerPublisher(EventHandler[Event]):
 
     async def __call__(self, event: Event) -> None:
         try:
-            integration_event = self._mapper.load(event, IntegrationEvents)
+            integration_event = self._mapper.load(event, IntegrationEvents)  # type: ignore
         except MappingError:
             return
         await self._event_bus.publish_event(integration_event)

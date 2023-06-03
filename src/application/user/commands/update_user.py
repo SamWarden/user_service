@@ -47,7 +47,7 @@ class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
 
     async def __call__(self, command: UpdateUser) -> dto.User:
         user = await self._user_repo.acquire_user_by_id(UserId(command.user_id))
-        username = (
+        username: Username | Empty = (
             Username(command.user_data.username) if command.user_data.username is not Empty.UNSET else Empty.UNSET
         )
         user.update(

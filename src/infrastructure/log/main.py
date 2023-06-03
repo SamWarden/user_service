@@ -54,7 +54,7 @@ def configure_logging(cfg: LoggingConfig) -> None:
     )
     handler.setFormatter(console_formatter)
 
-    handlers = [handler]
+    handlers: list[logging.Handler] = [handler]
     if cfg.path:
         cfg.path.parent.mkdir(parents=True, exist_ok=True)
         log_path = cfg.path / "logs.log" if cfg.path.is_dir() else cfg.path

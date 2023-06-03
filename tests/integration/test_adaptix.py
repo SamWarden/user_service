@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 import pytest
-from adaptix import Omitted, Retort, dumper, loader
+from adaptix import Retort
 from adaptix.load_error import TypeLoadError
 
 from src.infrastructure.mapper.converter import Converter

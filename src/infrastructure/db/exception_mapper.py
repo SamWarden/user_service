@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from functools import wraps
-from typing import ParamSpec, TypeVar
+from typing import Any, Coroutine, ParamSpec, TypeVar
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -11,7 +11,9 @@ ReturnType = TypeVar("ReturnType")
 Func = Callable[Param, ReturnType]
 
 
-def exception_mapper(func: Func) -> Func:
+def exception_mapper(
+    func: Callable[Param, Coroutine[Any, Any, ReturnType]]
+) -> Callable[Param, Coroutine[Any, Any, ReturnType]]:
     @wraps(func)
     async def wrapped(*args: Param.args, **kwargs: Param.kwargs) -> ReturnType:
         try:

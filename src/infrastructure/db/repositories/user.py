@@ -27,7 +27,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
         if user is None:
             raise UserIdNotExist(user_id)
 
-        return self._mapper.load(user, dto.UserDTOs)
+        return self._mapper.load(user, dto.UserDTOs)  # type: ignore
 
     @exception_mapper
     async def get_user_by_username(self, username: str) -> dto.User:

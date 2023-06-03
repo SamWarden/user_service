@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import TypeVar
+from typing import ClassVar, TypeVar
 from uuid import UUID
 
 from uuid6 import uuid7
@@ -11,8 +11,9 @@ from uuid6 import uuid7
 class IntegrationEvent:
     event_id: UUID = field(default_factory=uuid7)
     event_timestamp: datetime = field(default_factory=datetime.utcnow)
-    _exchange_name: str = field(init=False)
-    _routing_key: str = field(init=False)
+    event_type: ClassVar[str]
+    _exchange_name: ClassVar[str]
+    _routing_key: ClassVar[str]
 
 
 EventType = TypeVar("EventType", bound=type[IntegrationEvent])
@@ -20,7 +21,7 @@ EventType = TypeVar("EventType", bound=type[IntegrationEvent])
 
 def integration_event(
     event_type: str,
-    exchange: str | None = None,
+    exchange: str,
     routing_key: str | None = None,
 ) -> Callable[[EventType], EventType]:
     def _integration_event(cls: EventType) -> EventType:
