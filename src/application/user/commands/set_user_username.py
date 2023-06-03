@@ -8,6 +8,7 @@ from src.application.common.command import Command, CommandHandler
 from src.application.common.interfaces.uow import UnitOfWork
 from src.application.user import dto
 from src.application.user.converters import convert_active_user_entity_to_dto
+from src.application.user.exceptions import UsernameAlreadyExists
 from src.application.user.interfaces import UserRepo
 from src.domain.user.value_objects import UserId, Username
 
@@ -32,7 +33,13 @@ class SetUserUsernameHandler(CommandHandler[SetUserUsername, dto.User]):
         self._mediator = mediator
 
     async def __call__(self, command: SetUserUsername) -> dto.User:
-        user = await self._user_repo.acquire_user_by_id(UserId(command.user_id))
+        user_id = UserId(command.user_id)
+        username = Username(command.username)
+
+        if await self._user_repo.check_username_exists(username):
+            raise UsernameAlreadyExists(str(username))
+
+        user = await self._user_repo.acquire_user_by_id(user_id)
         user.set_username(Username(command.username))
         await self._user_repo.update_user(user)
         await self._mediator.publish(user.pull_events())

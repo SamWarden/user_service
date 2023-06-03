@@ -10,7 +10,7 @@ from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist,
 from src.application.user.interfaces.persistence import GetUsersFilters, GetUsersOrder, UserReader, UserRepo
 from src.domain.common.constants import Empty
 from src.domain.user import entities
-from src.domain.user.value_objects import UserId
+from src.domain.user.value_objects import UserId, Username
 from src.infrastructure.db.converters import (
     convert_db_model_to_active_user_dto,
     convert_db_model_to_deleted_user_dto,
@@ -26,7 +26,7 @@ from src.infrastructure.db.repositories.base import SQLAlchemyRepo
 class UserReaderImpl(SQLAlchemyRepo, UserReader):
     @exception_mapper
     async def get_user_by_id(self, user_id: UUID) -> dto.UserDTOs:
-        user = await self._session.scalar(
+        user: User | None = await self._session.scalar(
             select(User).where(
                 User.id == user_id,
             )
@@ -38,7 +38,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
 
     @exception_mapper
     async def get_user_by_username(self, username: str) -> dto.User:
-        user = await self._session.scalar(
+        user: User | None = await self._session.scalar(
             select(User).where(
                 User.username == username,
             )
@@ -76,7 +76,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
         if deleted is not Empty.UNSET:
             query = query.where(User.deleted == deleted)
 
-        users_count = await self._session.scalar(query)
+        users_count: int = await self._session.scalar(query)
         return users_count or 0
 
 
@@ -111,6 +111,16 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
             await self._session.merge(db_user)
         except IntegrityError as err:
             self._parse_error(err, user)
+
+    @exception_mapper
+    async def check_user_exists(self, user_id: UserId) -> bool:
+        user_exists: bool = await self._session.scalar(select(func.exists().where(User.id == user_id.to_uuid())))
+        return user_exists
+
+    @exception_mapper
+    async def check_username_exists(self, username: Username) -> bool:
+        username_exists: bool = await self._session.scalar(select(func.exists().where(User.username == str(username))))
+        return username_exists
 
     def _parse_error(self, err: DBAPIError, user: entities.User) -> NoReturn:
         match err.__cause__.__cause__.constraint_name:  # type: ignore
