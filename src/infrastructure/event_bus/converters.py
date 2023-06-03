@@ -1,5 +1,8 @@
+from src.application.common.exceptions import MappingError
 from src.domain.user.events import UserCreated, UserDeleted, UserUpdated
 from src.infrastructure.event_bus import events as integration_events
+
+DomainEvents = UserCreated | UserUpdated | UserDeleted
 
 
 def convert_user_created_to_integration(
@@ -30,3 +33,17 @@ def convert_user_deleted_to_integration(
     return integration_events.UserDeleted(
         user_id=event.user_id,
     )
+
+
+def convert_domain_event_to_integration(
+    event: DomainEvents,
+) -> integration_events.IntegrationEvent:
+    match event:
+        case UserCreated():
+            return convert_user_created_to_integration(event)
+        case UserUpdated():
+            return convert_user_updated_to_integration(event)
+        case UserDeleted():
+            return convert_user_deleted_to_integration(event)
+        case _:
+            raise MappingError(f"Event {event} cannot be mapped to integration event")

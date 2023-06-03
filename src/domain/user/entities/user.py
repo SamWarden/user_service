@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Self
 
 from src.domain.common.constants import Empty
 from src.domain.common.entities.aggregate_root import AggregateRoot
@@ -19,8 +20,8 @@ class User(AggregateRoot):
     deleted: bool = dataclasses.field(default=False, kw_only=True)
 
     @classmethod
-    def create(cls, user_id: UserId, username: Username, first_name: str, last_name: str | None) -> "User":
-        user = User(user_id, username, first_name, last_name)
+    def create(cls, user_id: UserId, username: Username, first_name: str, last_name: str | None) -> Self:
+        user = cls(user_id, username, first_name, last_name)
         user.record_event(UserCreated(user_id.to_uuid(), str(username), first_name, last_name))
         return user
 
