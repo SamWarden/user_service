@@ -105,7 +105,7 @@ services:
 
   grafana:
     profiles: [ "grafana" ]
-    image: grafana/grafana:9.3.6
+    image: grafana/grafana:9.5.2
     container_name: user_service.grafana
     hostname: user_service.grafana
     restart: unless-stopped
@@ -128,7 +128,7 @@ services:
 
   loki:
     profiles: [ "grafana" ]
-    image: grafana/loki:2.7.3
+    image: grafana/loki:2.8.2
     container_name: user_service.loki
     hostname: user_service.loki
     expose:
@@ -143,7 +143,7 @@ services:
 
   vector:
     profiles: [ "grafana" ]
-    image: timberio/vector:0.27.0-alpine
+    image: timberio/vector:0.29.1-alpine
     container_name: user_service.vector
     hostname: user_service.vector
     restart: unless-stopped
