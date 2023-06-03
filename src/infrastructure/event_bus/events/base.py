@@ -28,4 +28,5 @@ def integration_event(
         cls._exchange_name = exchange
         cls._routing_key = routing_key if routing_key is not None else event_type
         return cls
+
     return _integration_event

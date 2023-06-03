@@ -23,14 +23,25 @@ class GetUsersHandler(QueryHandler[GetUsers, dto.Users]):
         self._user_reader = user_reader
 
     async def __call__(self, query: GetUsers) -> dto.Users:
-        users = await self._user_reader.get_users(GetUsersFilters(
-            deleted=query.deleted, offset=query.offset, limit=query.limit, order=query.order,
-        ))
+        users = await self._user_reader.get_users(
+            GetUsersFilters(
+                deleted=query.deleted,
+                offset=query.offset,
+                limit=query.limit,
+                order=query.order,
+            )
+        )
         users_count = await self._user_reader.get_users_count(query.deleted)
-        logger.debug("Get users", extra={
-            "users": users, "total": users_count,
-            "offset": query.offset, "limit": query.limit, "deleted": query.deleted,
-        })
+        logger.debug(
+            "Get users",
+            extra={
+                "users": users,
+                "total": users_count,
+                "offset": query.offset,
+                "limit": query.limit,
+                "deleted": query.deleted,
+            },
+        )
         return dto.Users(
             users=users,
             total=users_count,

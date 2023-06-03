@@ -1,7 +1,7 @@
 from collections.abc import Awaitable, Callable
 
 import structlog
-from fastapi import Response, Request
+from fastapi import Request, Response
 
 
 async def structlog_bind_middleware(

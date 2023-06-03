@@ -11,7 +11,8 @@ Unknown = object
 
 class Converter(LoaderProvider, Generic[FromModel, ToModel]):
     def __init__(
-        self, from_cls: type[FromModel],
+        self,
+        from_cls: type[FromModel],
         to_cls: type[ToModel],
         loader: Callable[[FromModel], ToModel],
     ) -> None:

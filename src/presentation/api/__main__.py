@@ -5,8 +5,8 @@ from src.application.common.interfaces.mapper import Mapper
 from src.infrastructure.config_loader import load_config
 from src.infrastructure.di import DiScope, init_di_builder, setup_di_builder
 from src.infrastructure.event_bus.exchanges import declare_exchanges
-from src.infrastructure.mediator import init_mediator, setup_mediator
 from src.infrastructure.log import configure_logging
+from src.infrastructure.mediator import init_mediator, setup_mediator
 from src.presentation.api.main import init_api, run_api
 
 from .config import Config, setup_di_builder_config

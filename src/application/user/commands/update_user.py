@@ -33,7 +33,13 @@ class UpdateUser(Command[dto.User]):
 
 
 class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
-    def __init__(self, user_repo: UserRepo, uow: UnitOfWork, mapper: Mapper, mediator: EventMediator) -> None:
+    def __init__(
+        self,
+        user_repo: UserRepo,
+        uow: UnitOfWork,
+        mapper: Mapper,
+        mediator: EventMediator,
+    ) -> None:
         self._user_repo = user_repo
         self._uow = uow
         self._mapper = mapper
@@ -41,7 +47,9 @@ class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
 
     async def __call__(self, command: UpdateUser) -> dto.User:
         user = await self._user_repo.acquire_user_by_id(UserId(command.user_id))
-        username = Username(command.user_data.username) if command.user_data.username is not Empty.UNSET else Empty.UNSET
+        username = (
+            Username(command.user_data.username) if command.user_data.username is not Empty.UNSET else Empty.UNSET
+        )
         user.update(
             username,
             command.user_data.first_name,

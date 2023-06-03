@@ -20,10 +20,12 @@ def configure_logging(cfg: LoggingConfig) -> None:
         structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S.%f", utc=True),
         structlog.contextvars.merge_contextvars,
         structlog.processors.dict_tracebacks,
-        CallsiteParameterAdder((
-            CallsiteParameter.FUNC_NAME,
-            CallsiteParameter.LINENO,
-        )),
+        CallsiteParameterAdder(
+            (
+                CallsiteParameter.FUNC_NAME,
+                CallsiteParameter.LINENO,
+            )
+        ),
     )
     structlog_processors = (
         structlog.processors.StackInfoRenderer(),
@@ -33,9 +35,7 @@ def configure_logging(cfg: LoggingConfig) -> None:
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         # structlog.processors.format_exc_info,  # print exceptions from event dict
     )
-    logging_processors = (
-        structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-    )
+    logging_processors = (structlog.stdlib.ProcessorFormatter.remove_processors_meta,)
     logging_console_processors = (
         *logging_processors,
         get_render_processor(render_json_logs=cfg.render_json_logs, colors=True),

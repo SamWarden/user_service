@@ -19,9 +19,11 @@ from src.infrastructure.db.repositories.base import SQLAlchemyRepo
 class UserReaderImpl(SQLAlchemyRepo, UserReader):
     @exception_mapper
     async def get_user_by_id(self, user_id: UUID) -> dto.UserDTOs:
-        user = await self._session.scalar(select(User).where(
-            User.id == user_id,
-        ))
+        user = await self._session.scalar(
+            select(User).where(
+                User.id == user_id,
+            )
+        )
         if user is None:
             raise UserIdNotExist(user_id)
 
@@ -29,9 +31,11 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
 
     @exception_mapper
     async def get_user_by_username(self, username: str) -> dto.User:
-        user = await self._session.scalar(select(User).where(
-            User.username == username,
-        ))
+        user = await self._session.scalar(
+            select(User).where(
+                User.username == username,
+            )
+        )
         if user is None:
             raise UsernameNotExist(username)
 
@@ -72,9 +76,13 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
 class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     @exception_mapper
     async def acquire_user_by_id(self, user_id: UserId) -> entities.User:
-        user = await self._session.scalar(select(User).where(
-            User.id == user_id.to_uuid(),
-        ).with_for_update())
+        user = await self._session.scalar(
+            select(User)
+            .where(
+                User.id == user_id.to_uuid(),
+            )
+            .with_for_update()
+        )
         if user is None:
             raise UserIdNotExist(user_id.to_uuid())
 

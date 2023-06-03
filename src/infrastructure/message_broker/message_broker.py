@@ -1,8 +1,8 @@
 import logging
 
 import aio_pika
-from aio_pika.abc import AbstractChannel
 import orjson
+from aio_pika.abc import AbstractChannel
 
 from .interface import MessageBroker
 from .message import Message
@@ -15,7 +15,10 @@ class MessageBrokerImpl(MessageBroker):
         self._channel = channel
 
     async def publish_message(
-        self, message: Message, routing_key: str, exchange_name: str,
+        self,
+        message: Message,
+        routing_key: str,
+        exchange_name: str,
     ) -> None:
         rq_message = self.build_message(message)
         await self._publish_message(rq_message, routing_key, exchange_name)
@@ -34,7 +37,10 @@ class MessageBrokerImpl(MessageBroker):
         )
 
     async def _publish_message(
-        self, rq_message: aio_pika.Message, routing_key: str, exchange_name: str,
+        self,
+        rq_message: aio_pika.Message,
+        routing_key: str,
+        exchange_name: str,
     ) -> None:
         exchange = await self._get_exchange(exchange_name)
         await exchange.publish(rq_message, routing_key=routing_key)

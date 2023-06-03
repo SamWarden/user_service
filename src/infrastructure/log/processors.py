@@ -8,8 +8,11 @@ import structlog
 
 ProcessorType = Callable[
     [
-        structlog.types.WrappedLogger, str, structlog.types.EventDict,
-    ], str | bytes
+        structlog.types.WrappedLogger,
+        str,
+        structlog.types.EventDict,
+    ],
+    str | bytes,
 ]
 
 

@@ -1,7 +1,7 @@
 # User Service
 
 User service is a simple CRUD Web API that adheres to the principles of Clean Architecture,
-uses some DDD tactical patterns and follows CQRS 
+uses some DDD tactical patterns and follows CQRS
 
 ![List of endpoints](https://i.imgur.com/aeZe8Xz.png)
 
@@ -81,7 +81,7 @@ curl -X "GET" "http://127.0.0.1:5000/users/?offset=0&limit=1000&order=asc"
 - [FastAPI](https://fastapi.tiangolo.com/) — Async web framework
 - [SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/) — ORM for working with database
 - [Alembic](https://alembic.sqlalchemy.org/en/latest/) — Database schema migration tool
-- [DI](https://www.adriangb.com/di/0.73.0/) — A dependency injection tool for easy initialization and delivery of dependencies 
+- [DI](https://www.adriangb.com/di/0.73.0/) — A dependency injection tool for easy initialization and delivery of dependencies
 - [didiator](https://github.com/SamWarden/didiator) — Mediator to interact with application layer and publish events
 - [adaptix](https://dataclass-factory.readthedocs.io/en/3.x-develop/) (dataclass_factory 3.0a0) — Library for simple model serialization and mapping
 - [structlog](https://structlog.org/) — For better logging config

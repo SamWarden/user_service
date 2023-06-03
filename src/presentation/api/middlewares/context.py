@@ -1,7 +1,6 @@
 from collections.abc import Awaitable, Callable
 
-from fastapi import Request
-from fastapi import Response
+from fastapi import Request, Response
 from uuid6 import uuid7
 
 

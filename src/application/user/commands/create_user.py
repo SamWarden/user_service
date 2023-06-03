@@ -27,7 +27,13 @@ class CreateUser(Command[dto.User]):
 
 
 class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
-    def __init__(self, user_repo: UserRepo, uow: UnitOfWork, mapper: Mapper, mediator: EventMediator) -> None:
+    def __init__(
+        self,
+        user_repo: UserRepo,
+        uow: UnitOfWork,
+        mapper: Mapper,
+        mediator: EventMediator,
+    ) -> None:
         self._user_repo = user_repo
         self._uow = uow
         self._mapper = mapper

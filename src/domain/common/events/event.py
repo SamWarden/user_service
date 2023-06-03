@@ -4,7 +4,6 @@ from datetime import datetime
 from uuid import UUID
 
 import didiator
-
 from uuid6 import uuid7
 
 

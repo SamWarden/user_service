@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import ClassVar
 from uuid import UUID
 
 from src.application.common.exceptions import ApplicationException

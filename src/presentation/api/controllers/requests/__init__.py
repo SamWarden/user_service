@@ -1,5 +1,3 @@
 from .user import UpdateUserData
 
-__all__ = (
-    "UpdateUserData",
-)
+__all__ = ("UpdateUserData",)

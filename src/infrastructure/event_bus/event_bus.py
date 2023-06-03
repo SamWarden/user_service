@@ -2,8 +2,8 @@ import logging
 
 import orjson
 
-from src.infrastructure.message_broker import Message, MessageBroker
 from src.infrastructure.log.processors import additionally_serialize
+from src.infrastructure.message_broker import Message, MessageBroker
 
 from .events.base import IntegrationEvent
 

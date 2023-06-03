@@ -4,9 +4,9 @@ from didiator.interface.utils.di_builder import DiBuilder
 from fastapi import FastAPI
 
 from src.application.common.interfaces.mapper import Mapper
-from src.presentation.api.presenter import build_presenter, Presenter
+from src.presentation.api.presenter import Presenter, build_presenter
 
-from .di import get_di_builder, get_di_state, StateProvider
+from .di import StateProvider, get_di_builder, get_di_state
 from .mediator import MediatorProvider
 from .stub import Stub
 

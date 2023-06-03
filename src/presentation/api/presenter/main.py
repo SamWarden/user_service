@@ -29,6 +29,4 @@ class PresenterImpl(Presenter):
 
 
 def build_presenter() -> Presenter:
-    return PresenterImpl(Retort(recipe=(
-        Converter(dto.Users, responses.Users, convert_dto_to_users_response),
-    )))
+    return PresenterImpl(Retort(recipe=(Converter(dto.Users, responses.Users, convert_dto_to_users_response),)))

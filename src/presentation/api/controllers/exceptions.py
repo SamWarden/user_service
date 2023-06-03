@@ -22,11 +22,20 @@ async def exception_handler(request: Request, err: Exception) -> ORJSONResponse:
 
     match err:
         case TooLongUsername() | EmptyUsername() | WrongUsernameFormat() as err:
-            return ORJSONResponse(ErrorResult(message=err.message, data=err), status_code=status.HTTP_400_BAD_REQUEST)
+            return ORJSONResponse(
+                ErrorResult(message=err.message, data=err),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
         case UserIdNotExist() | UsernameNotExist() as err:
-            return ORJSONResponse(ErrorResult(message=err.message, data=err), status_code=status.HTTP_404_NOT_FOUND)
+            return ORJSONResponse(
+                ErrorResult(message=err.message, data=err),
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
         case UsernameAlreadyExists() | UserIdAlreadyExists() | UserIsDeleted() as err:
-            return ORJSONResponse(ErrorResult(message=err.message, data=err), status_code=status.HTTP_409_CONFLICT)
+            return ORJSONResponse(
+                ErrorResult(message=err.message, data=err),
+                status_code=status.HTTP_409_CONFLICT,
+            )
         case _:
             logger.exception("Unknown error occurred", exc_info=err, extra={"error": err})
             return ORJSONResponse(

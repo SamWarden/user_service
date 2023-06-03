@@ -13,5 +13,9 @@ class DBConfig:
     @property
     def full_url(self) -> str:
         return "postgresql+asyncpg://{}:{}@{}:{}/{}".format(
-            self.user, self.password, self.host, self.port, self.database,
+            self.user,
+            self.password,
+            self.host,
+            self.port,
+            self.database,
         )

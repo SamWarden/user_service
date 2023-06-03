@@ -3,7 +3,7 @@ from uuid import UUID
 
 from src.infrastructure.event_bus.exchanges import USER_EXCHANGE
 
-from .base import integration_event, IntegrationEvent
+from .base import IntegrationEvent, integration_event
 
 
 @dataclass(frozen=True)

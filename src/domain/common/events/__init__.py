@@ -1,5 +1,3 @@
 from .event import Event
 
-__all__ = (
-    "Event",
-)
+__all__ = ("Event",)

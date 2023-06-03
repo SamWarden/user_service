@@ -12,6 +12,6 @@ default_router = APIRouter(
 @default_router.get("/")
 async def default_redirect() -> RedirectResponse:
     return RedirectResponse(
-        '/docs',
+        "/docs",
         status_code=status.HTTP_302_FOUND,
     )

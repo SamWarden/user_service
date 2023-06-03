@@ -12,7 +12,10 @@ from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist,
 from src.application.user.interfaces.persistence import GetUsersOrder
 from src.application.user.queries import GetUserById, GetUserByUsername, GetUsers
 from src.application.user.validators.username import (
-    EmptyUsername, MAX_USERNAME_LENGTH, TooLongUsername, WrongUsernameFormat,
+    MAX_USERNAME_LENGTH,
+    EmptyUsername,
+    TooLongUsername,
+    WrongUsernameFormat,
 )
 from src.domain.common.constants import Empty
 from src.domain.user.exceptions import UserIsDeleted
@@ -36,7 +39,7 @@ user_router = APIRouter(
         },
         status.HTTP_409_CONFLICT: {
             "model": ErrorResult[Union[UsernameAlreadyExists, UserIdAlreadyExists]],
-        }
+        },
     },
     status_code=status.HTTP_201_CREATED,
 )
@@ -79,7 +82,8 @@ async def get_user_by_id(
 
 
 @user_router.get(
-    "/", description="Return all users",
+    "/",
+    description="Return all users",
 )
 async def get_users(
     deleted: bool | None = None,
@@ -89,12 +93,14 @@ async def get_users(
     mediator: QueryMediator = Depends(Stub(QueryMediator)),
     presenter: Presenter = Depends(Stub(Presenter)),
 ) -> responses.Users:
-    users = await mediator.query(GetUsers(
-        deleted=deleted if deleted is not None else Empty.UNSET,
-        offset=offset,
-        limit=limit,
-        order=order,
-    ))
+    users = await mediator.query(
+        GetUsers(
+            deleted=deleted if deleted is not None else Empty.UNSET,
+            offset=offset,
+            limit=limit,
+            order=order,
+        )
+    )
     return presenter.load(users, responses.Users)
 
 
