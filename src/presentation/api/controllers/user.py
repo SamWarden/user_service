@@ -2,7 +2,7 @@ from typing import Union
 from uuid import UUID
 
 from didiator import CommandMediator, QueryMediator
-from fastapi import APIRouter, Depends, Path, Query, status
+from fastapi import APIRouter, Depends, Query, status
 
 from src.application.user import dto
 from src.application.user.commands import CreateUser, DeleteUser
@@ -10,14 +10,9 @@ from src.application.user.commands.update_user import UpdateUser
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.application.user.interfaces.persistence import GetUsersOrder
 from src.application.user.queries import GetUserById, GetUserByUsername, GetUsers
-from src.application.user.validators.username import (
-    MAX_USERNAME_LENGTH,
-    EmptyUsername,
-    TooLongUsername,
-    WrongUsernameFormat,
-)
 from src.domain.common.constants import Empty
 from src.domain.user.exceptions import UserIsDeleted
+from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.presentation.api.controllers import requests, responses
 from src.presentation.api.controllers.responses import ErrorResult
 from src.presentation.api.converters import convert_dto_to_users_response, convert_request_to_update_user_command
@@ -58,7 +53,7 @@ async def create_user(
     },
 )
 async def get_user_by_username(
-    username: str = Path(max_length=MAX_USERNAME_LENGTH),
+    username: str,
     mediator: QueryMediator = Depends(Stub(QueryMediator)),
 ) -> dto.User:
     user = await mediator.query(GetUserByUsername(username=username))

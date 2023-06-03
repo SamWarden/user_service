@@ -6,8 +6,8 @@ from starlette import status
 from starlette.requests import Request
 
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
-from src.application.user.validators.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.domain.user.exceptions import UserIsDeleted
+from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.presentation.api.controllers.responses import ErrorResult
 
 logger = logging.getLogger(__name__)

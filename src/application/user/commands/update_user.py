@@ -6,7 +6,7 @@ from didiator import EventMediator
 
 from src.application.common.command import Command, CommandHandler
 from src.application.common.interfaces.uow import UnitOfWork
-from src.application.user import dto, validators
+from src.application.user import dto
 from src.application.user.converters import convert_active_user_entity_to_dto
 from src.application.user.interfaces import UserRepo
 from src.domain.common.constants import Empty
@@ -20,10 +20,6 @@ class UpdateUserData:
     username: str | Empty = Empty.UNSET
     first_name: str | Empty = Empty.UNSET
     last_name: str | None | Empty = Empty.UNSET
-
-    def __post_init__(self) -> None:
-        if self.username is not Empty.UNSET:
-            validators.validate_username(self.username)
 
 
 @dataclass(frozen=True)
