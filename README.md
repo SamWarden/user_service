@@ -3,7 +3,7 @@
 User service is a simple CRUD Web API that adheres to the principles of Clean Architecture,
 uses some DDD tactical patterns and follows CQRS
 
-![List of endpoints](https://i.imgur.com/aeZe8Xz.png)
+![List of endpoints](https://i.imgur.com/JCGkLye.png)
 
 ## Endpoints
 
