@@ -1,7 +1,6 @@
 import asyncio
 import logging
 
-from src.application.common.interfaces.mapper import Mapper
 from src.infrastructure.config_loader import load_config
 from src.infrastructure.di import DiScope, init_di_builder, setup_di_builder
 from src.infrastructure.event_bus.exchanges import declare_exchanges
@@ -31,9 +30,7 @@ async def main() -> None:
         async with di_builder.enter_scope(DiScope.REQUEST, state=di_state) as request_di_state:
             await di_builder.execute(declare_exchanges, DiScope.REQUEST, state=request_di_state)
 
-        mapper = await di_builder.execute(Mapper, DiScope.APP, state=di_state)
-
-        app = init_api(mediator, mapper, di_builder, di_state)
+        app = init_api(mediator, di_builder, di_state)
         await run_api(app, config.api)
 
 

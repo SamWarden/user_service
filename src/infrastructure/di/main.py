@@ -9,14 +9,12 @@ from didiator.interface.utils.di_builder import DiBuilder
 from didiator.utils.di_builder import DiBuilderImpl
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from src.application.common.interfaces.mapper import Mapper
 from src.application.common.interfaces.uow import UnitOfWork
 from src.application.user.interfaces.persistence import UserReader, UserRepo
 from src.infrastructure.db.main import build_sa_engine, build_sa_session, build_sa_session_factory
 from src.infrastructure.db.repositories.user import UserReaderImpl, UserRepoImpl
 from src.infrastructure.di import DiScope
 from src.infrastructure.event_bus.event_bus import EventBusImpl
-from src.infrastructure.mapper.main import build_mapper
 from src.infrastructure.mediator import get_mediator
 from src.infrastructure.message_broker.interface import MessageBroker
 from src.infrastructure.message_broker.main import (
@@ -39,7 +37,6 @@ def init_di_builder() -> DiBuilder:
 
 def setup_di_builder(di_builder: DiBuilder) -> None:
     di_builder.bind(bind_by_type(Dependent(lambda *args: di_builder, scope=DiScope.APP), DiBuilder))
-    di_builder.bind(bind_by_type(Dependent(build_mapper, scope=DiScope.APP), Mapper))
     di_builder.bind(bind_by_type(Dependent(build_uow, scope=DiScope.REQUEST), UnitOfWork))
     setup_mediator_factory(di_builder, get_mediator, DiScope.REQUEST)
     setup_db_factories(di_builder)

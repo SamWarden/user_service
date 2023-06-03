@@ -11,6 +11,13 @@ from src.application.user.interfaces.persistence import GetUsersFilters, GetUser
 from src.domain.common.constants import Empty
 from src.domain.user import entities
 from src.domain.user.value_objects import UserId
+from src.infrastructure.db.converters import (
+    convert_db_model_to_active_user_dto,
+    convert_db_model_to_deleted_user_dto,
+    convert_db_model_to_user_dto,
+    convert_db_model_to_user_entity,
+    convert_user_entity_to_db_model,
+)
 from src.infrastructure.db.exception_mapper import exception_mapper
 from src.infrastructure.db.models.user import User
 from src.infrastructure.db.repositories.base import SQLAlchemyRepo
@@ -27,7 +34,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
         if user is None:
             raise UserIdNotExist(user_id)
 
-        return self._mapper.load(user, dto.UserDTOs)  # type: ignore
+        return convert_db_model_to_deleted_user_dto(user)
 
     @exception_mapper
     async def get_user_by_username(self, username: str) -> dto.User:
@@ -39,7 +46,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
         if user is None:
             raise UsernameNotExist(username)
 
-        return self._mapper.load(user, dto.User)
+        return convert_db_model_to_active_user_dto(user)
 
     @exception_mapper
     async def get_users(self, filters: GetUsersFilters) -> list[dto.UserDTOs]:
@@ -59,9 +66,9 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
             query = query.limit(filters.limit)
 
         result = await self._session.scalars(query)
-        users = result.all()
+        users: list[User] = list(result)
 
-        return self._mapper.load(users, list[dto.UserDTOs])
+        return [convert_db_model_to_user_dto(user) for user in users]
 
     async def get_users_count(self, deleted: bool | Empty = Empty.UNSET) -> int:
         query = select(func.count(User.id))
@@ -76,7 +83,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
 class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     @exception_mapper
     async def acquire_user_by_id(self, user_id: UserId) -> entities.User:
-        user = await self._session.scalar(
+        user: User | None = await self._session.scalar(
             select(User)
             .where(
                 User.id == user_id.to_uuid(),
@@ -86,11 +93,11 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
         if user is None:
             raise UserIdNotExist(user_id.to_uuid())
 
-        return self._mapper.load(user, entities.User)
+        return convert_db_model_to_user_entity(user)
 
     @exception_mapper
     async def add_user(self, user: entities.User) -> None:
-        db_user = self._mapper.load(user, User)
+        db_user = convert_user_entity_to_db_model(user)
         self._session.add(db_user)
         try:
             await self._session.flush((db_user,))
@@ -99,7 +106,7 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
 
     @exception_mapper
     async def update_user(self, user: entities.User) -> None:
-        db_user = self._mapper.load(user, User)
+        db_user = convert_user_entity_to_db_model(user)
         try:
             await self._session.merge(db_user)
         except IntegrityError as err:

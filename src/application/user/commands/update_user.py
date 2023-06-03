@@ -5,9 +5,9 @@ from uuid import UUID
 from didiator import EventMediator
 
 from src.application.common.command import Command, CommandHandler
-from src.application.common.interfaces.mapper import Mapper
 from src.application.common.interfaces.uow import UnitOfWork
 from src.application.user import dto, validators
+from src.application.user.converters import convert_active_user_entity_to_dto
 from src.application.user.interfaces import UserRepo
 from src.domain.common.constants import Empty
 from src.domain.user.value_objects import UserId, Username
@@ -37,12 +37,10 @@ class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
         self,
         user_repo: UserRepo,
         uow: UnitOfWork,
-        mapper: Mapper,
         mediator: EventMediator,
     ) -> None:
         self._user_repo = user_repo
         self._uow = uow
-        self._mapper = mapper
         self._mediator = mediator
 
     async def __call__(self, command: UpdateUser) -> dto.User:
@@ -61,5 +59,5 @@ class UpdateUserHandler(CommandHandler[UpdateUser, dto.User]):
 
         logger.info("User updated", extra={"user": user})
 
-        user_dto = self._mapper.load(user, dto.User)
+        user_dto = convert_active_user_entity_to_dto(user)
         return user_dto
