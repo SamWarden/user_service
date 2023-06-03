@@ -75,6 +75,24 @@ services:
       retries: 5
       start_period: 10s
 
+  postgres_backup:
+    profiles: [ "api" ]
+    container_name: user_service.postgres_backup
+    image: prodrigestivill/postgres-backup-local:15-alpine
+    networks:
+      - user_service.postgres.network
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-$USER}
+      - POSTGRES_USER=${POSTGRES_USER:-$USER}
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - BACKUP_DIR=/backups
+      - POSTGRES_EXTRA_OPTS=-Z6 --schema=public --blobs
+      - SCHEDULE=${POSTGRES_BACKUP_SCHEDULE:-@daily}
+      - HEALTHCHECK_PORT=8080
+    volumes:
+      - ${POSTGRES_BACKUP_DIR:-./.backups/postgres}:/backups
+
   rabbitmq:
     profiles: [ "api" ]
     image: rabbitmq:3.11-management-alpine
