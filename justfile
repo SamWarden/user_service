@@ -1,3 +1,5 @@
+package_dir := "src"
+
 # Show help message
 help:
     just -l
@@ -16,7 +18,7 @@ test:
 
 # Run app
 run:
-	$(py) python -m $(package_dir)
+	$(py) python -m {{package_dir}}
 
 # Run app in docker container
 up:

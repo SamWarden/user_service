@@ -20,8 +20,7 @@ from src.domain.common.constants import Empty
 from src.domain.user.exceptions import UserIsDeleted
 from src.presentation.api.controllers import requests, responses
 from src.presentation.api.controllers.responses import ErrorResult
-from src.presentation.api.converters import convert_request_to_update_user_command
-from src.presentation.api.presenter import Presenter
+from src.presentation.api.converters import convert_dto_to_users_response, convert_request_to_update_user_command
 from src.presentation.api.providers.stub import Stub
 
 user_router = APIRouter(
@@ -91,7 +90,6 @@ async def get_users(
     limit: int = Query(1000, ge=0, le=1000),
     order: GetUsersOrder = GetUsersOrder.ASC,
     mediator: QueryMediator = Depends(Stub(QueryMediator)),
-    presenter: Presenter = Depends(Stub(Presenter)),
 ) -> responses.Users:
     users = await mediator.query(
         GetUsers(
@@ -101,7 +99,7 @@ async def get_users(
             order=order,
         )
     )
-    return presenter.load(users, responses.Users)
+    return convert_dto_to_users_response(users)
 
 
 @user_router.patch(
