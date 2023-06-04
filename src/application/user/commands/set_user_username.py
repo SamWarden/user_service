@@ -41,7 +41,11 @@ class SetUserUsernameHandler(CommandHandler[SetUserUsername, dto.User]):
 
         user = await self._user_repo.acquire_user_by_id(user_id)
         user.set_username(username)
-        await self._user_repo.update_user(user)
+        try:
+            await self._user_repo.update_user(user)
+        except Exception as err:
+            await self._uow.rollback()
+            raise err
         await self._mediator.publish(user.pull_events())
         await self._uow.commit()
 

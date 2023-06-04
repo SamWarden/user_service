@@ -47,7 +47,11 @@ class CreateUserHandler(CommandHandler[CreateUser, dto.User]):
             raise UsernameAlreadyExists(str(username))
 
         user = User.create(user_id, username, full_name)
-        await self._user_repo.add_user(user)
+        try:
+            await self._user_repo.add_user(user)
+        except Exception as err:
+            await self._uow.rollback()
+            raise err
         await self._mediator.publish(user.pull_events())
         await self._uow.commit()
 
