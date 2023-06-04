@@ -90,6 +90,5 @@ curl -X "GET" "http://127.0.0.1:5000/users/?offset=0&limit=1000&order=asc"
 ### TODO
 
 - [ ] Implement outbox pattern
-- [ ] Add auto-tests
-- [ ] Configure CI
-- [ ] Configure Nginx
+- [X] Add auto-tests
+- [X] Configure CI
