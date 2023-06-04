@@ -13,8 +13,8 @@ lint:
 	just _py pre-commit run --all-files
 
 # Run tests
-test:
-    just _py pytest
+test *args:
+    just _py pytest {{args}}
 
 # Run app
 run:
