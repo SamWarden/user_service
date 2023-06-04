@@ -10,7 +10,6 @@ async def build_sa_engine(db_config: DBConfig) -> AsyncGenerator[AsyncEngine, No
     engine = create_async_engine(
         db_config.full_url,
         echo_pool=db_config.echo,
-        future=False,
         json_serializer=lambda data: orjson.dumps(data).decode(),
         json_deserializer=orjson.loads,
         pool_size=50,

@@ -17,7 +17,7 @@ repository = "https://github.com/SamWarden/user_service"
 python = "^3.11"
 sqlalchemy = "^2.0.15"
 structlog = "^23.1.0"
-fastapi = "^0.95.2"
+fastapi = "^0.96.0"
 orjson = "^3.9.0"
 alembic = "^1.11.1"
 rich = "^13.4.1"
@@ -41,6 +41,8 @@ optional = true
 [tool.poetry.group.test.dependencies]
 pytest = "^7.3.1"
 pytest-asyncio = "^0.20.3"
+testcontainers = {version = "^3.7.1", extras = ["postgresql"]}
+pytest-order = "^1.1.0"
 
 [tool.poetry.group.lint]
 optional = true
@@ -75,7 +77,7 @@ include_trailing_comma = true
 combine_as_imports = true
 remove_redundant_aliases = true
 
-[tool.pytest]
+[tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 
