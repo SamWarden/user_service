@@ -12,6 +12,7 @@ from src.application.user.interfaces.persistence import GetUsersOrder
 from src.application.user.queries import GetUserById, GetUserByUsername, GetUsers
 from src.domain.common.constants import Empty
 from src.domain.user.exceptions import UserIsDeleted
+from src.domain.user.value_objects.full_name import EmptyName, TooLongName, WrongNameFormat
 from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.presentation.api.controllers import requests, responses
 from src.presentation.api.controllers.responses import ErrorResult
@@ -97,12 +98,14 @@ async def get_users(
     return convert_dto_to_users_response(users)
 
 
-@user_router.post(
+@user_router.put(
     "/{user_id}/username",
     responses={
         status.HTTP_200_OK: {"model": dto.User},
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorResult[Union[UserIdNotExist, UsernameAlreadyExists]]},
-        status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResult[Union[UserIdNotExist, TooLongUsername, EmptyUsername, WrongUsernameFormat]],
+        },
+        status.HTTP_409_CONFLICT: {"model": ErrorResult[Union[UserIsDeleted, UsernameAlreadyExists]]},
     },
 )
 async def set_user_username(
@@ -115,11 +118,13 @@ async def set_user_username(
     return user
 
 
-@user_router.post(
+@user_router.put(
     "/{user_id}/full-name",
     responses={
         status.HTTP_200_OK: {"model": dto.User},
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorResult[Union[UserIdNotExist]]},
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResult[Union[UserIdNotExist, EmptyName, WrongNameFormat, TooLongName]],
+        },
         status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
     },
 )

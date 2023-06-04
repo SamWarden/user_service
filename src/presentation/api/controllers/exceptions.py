@@ -7,6 +7,7 @@ from starlette.requests import Request
 
 from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
 from src.domain.user.exceptions import UserIsDeleted
+from src.domain.user.value_objects.full_name import EmptyName, TooLongName, WrongNameFormat
 from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
 from src.presentation.api.controllers.responses import ErrorResult
 
@@ -21,7 +22,14 @@ async def exception_handler(request: Request, err: Exception) -> ORJSONResponse:
     logger.error("Handle error", exc_info=err, extra={"error": err})
 
     match err:
-        case TooLongUsername() | EmptyUsername() | WrongUsernameFormat() as err:
+        case (
+            TooLongUsername()
+            | EmptyUsername()
+            | WrongUsernameFormat()
+            | TooLongName()
+            | EmptyName()
+            | WrongNameFormat()
+        ) as err:
             return ORJSONResponse(
                 ErrorResult(message=err.message, data=err),
                 status_code=status.HTTP_400_BAD_REQUEST,

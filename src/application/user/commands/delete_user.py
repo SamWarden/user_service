@@ -32,6 +32,7 @@ class DeleteUserHandler(CommandHandler[DeleteUser, dto.DeletedUser]):
 
     async def __call__(self, command: DeleteUser) -> dto.DeletedUser:
         user_id = UserId(command.user_id)
+
         user = await self._user_repo.acquire_user_by_id(user_id)
         user.delete()
         await self._user_repo.update_user(user)
