@@ -25,7 +25,7 @@ async def test_set_user_username_handler_success(
         username=None,
         full_name=FullName("John", "Doe"),
     )
-    user_repo.users[user.id] = user
+    await user_repo.add_user(user)
 
     command = SetUserUsername(
         user_id=user_id,
@@ -62,7 +62,7 @@ async def test_set_user_username_handler_username_exists(
         username=Username(username),
         full_name=FullName("John", "Doe"),
     )
-    user_repo.users[user.id] = user
+    await user_repo.add_user(user)
 
     command = SetUserUsername(
         user_id=user_id,
@@ -110,8 +110,8 @@ async def test_set_user_username_handler_user_deleted(
         username=None,
         full_name=FullName("John", "Doe"),
     )
-    user.deleted = True  # Simulate user being deleted
-    user_repo.users[user.id] = user
+    user.delete()
+    await user_repo.add_user(user)
 
     command = SetUserUsername(
         user_id=user_id,

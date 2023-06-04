@@ -24,7 +24,7 @@ async def test_set_user_full_name_handler_success(
         username=Username("john_doe"),
         full_name=FullName("John", "Doe"),
     )
-    user_repo.users[user.id] = user
+    await user_repo.add_user(user)
 
     command = SetUserFullName(
         user_id=user_id,
@@ -87,7 +87,7 @@ async def test_set_user_full_name_handler_user_deleted(
         full_name=FullName("John", "Doe"),
     )
     user.delete()
-    user_repo.users[user.id] = user
+    await user_repo.add_user(user)
 
     command = SetUserFullName(
         user_id=user_id,
