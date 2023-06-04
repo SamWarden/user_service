@@ -1,0 +1,85 @@
+from uuid import UUID
+
+import pytest
+
+from src.application.user import dto
+from src.application.user.commands import DeleteUser, DeleteUserHandler
+from src.application.user.exceptions import UserIdNotExist
+from src.domain.user import User
+from src.domain.user.events import UserDeleted
+from src.domain.user.exceptions import UserIsDeleted
+from src.domain.user.value_objects import FullName, UserId, Username
+from tests.mocks import EventMediatorMock, UserRepoMock
+from tests.mocks.uow import UnitOfWorkMock
+
+
+async def test_delete_user_handler_success(
+    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+) -> None:
+    handler = DeleteUserHandler(user_repo, uow, event_mediator)
+
+    user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
+    user = User(
+        id=UserId(user_id),
+        username=Username("john_doe"),
+        full_name=FullName("John", "Doe"),
+    )
+    user_repo.users[user.id] = user
+
+    command = DeleteUser(user_id=user_id)
+
+    result = await handler(command)
+
+    assert result == dto.DeletedUser(
+        id=user_id,
+        first_name=user.full_name.first_name,
+        last_name=user.full_name.last_name,
+        middle_name=user.full_name.middle_name,
+    )
+    assert len(event_mediator.published_events) == 1
+    published_event = event_mediator.published_events[0]
+    assert isinstance(published_event, UserDeleted)
+    assert published_event.user_id == user_id
+
+    assert uow.committed is True
+
+
+async def test_delete_user_handler_user_not_found(
+    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+) -> None:
+    handler = DeleteUserHandler(user_repo, uow, event_mediator)
+
+    user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
+
+    command = DeleteUser(user_id=user_id)
+
+    with pytest.raises(UserIdNotExist):
+        await handler(command)
+
+    assert len(event_mediator.published_events) == 0
+    assert uow.committed is False
+    assert uow.rolled_back is False
+
+
+async def test_delete_user_handler_user_already_deleted(
+    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+) -> None:
+    handler = DeleteUserHandler(user_repo, uow, event_mediator)
+
+    user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
+    user = User(
+        id=UserId(user_id),
+        username=Username("john_doe"),
+        full_name=FullName("John", "Doe"),
+    )
+    user.delete()
+    user_repo.users[user.id] = user
+
+    command = DeleteUser(user_id=user_id)
+
+    with pytest.raises(UserIsDeleted):
+        await handler(command)
+
+    assert len(event_mediator.published_events) == 0
+    assert uow.committed is False
+    assert uow.rolled_back is False
