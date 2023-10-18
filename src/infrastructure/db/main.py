@@ -9,6 +9,7 @@ from .config import DBConfig
 async def build_sa_engine(db_config: DBConfig) -> AsyncGenerator[AsyncEngine, None]:
     engine = create_async_engine(
         db_config.full_url,
+        echo=True,
         echo_pool=db_config.echo,
         json_serializer=lambda data: orjson.dumps(data).decode(),
         json_deserializer=orjson.loads,

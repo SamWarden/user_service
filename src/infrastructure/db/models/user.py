@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -16,4 +17,4 @@ class User(TimedBaseModel):
     first_name: Mapped[str]
     last_name: Mapped[str]
     middle_name: Mapped[str | None]
-    deleted: Mapped[bool] = mapped_column(default=False, server_default=sa.False_())
+    deleted_at: Mapped[datetime | None] = mapped_column(default=None, server_default=sa.Null())
