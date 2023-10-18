@@ -2,12 +2,11 @@ from uuid import UUID
 
 import pytest
 
-from src.application.user import dto
 from src.application.user.commands import SetUserUsername, SetUserUsernameHandler
-from src.application.user.exceptions import UserIdNotExist, UsernameAlreadyExists
+from src.application.user.exceptions import UserIdNotExist
 from src.domain.user import User
 from src.domain.user.events import UsernameUpdated
-from src.domain.user.exceptions import UserIsDeleted
+from src.domain.user.exceptions import UserIsDeleted, UsernameAlreadyExists
 from src.domain.user.value_objects import FullName, UserId, Username
 from tests.mocks import EventMediatorMock, UserRepoMock
 from tests.mocks.uow import UnitOfWorkMock
@@ -18,34 +17,30 @@ async def test_set_user_username_handler_success(
 ) -> None:
     handler = SetUserUsernameHandler(user_repo, uow, event_mediator)
 
-    user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
-    username = "john_doe"
+    user_id = UserId(UUID("123e4567-e89b-12d3-a456-426614174000"))
+    old_username = Username("old_username")
+    new_username = "new_username"
+    full_name = FullName("John", "Doe")
     user = User(
-        id=UserId(user_id),
-        username=None,
-        full_name=FullName("John", "Doe"),
+        id=user_id,
+        username=old_username,
+        full_name=full_name,
+        existing_usernames={old_username},
     )
     await user_repo.add_user(user)
 
-    command = SetUserUsername(
-        user_id=user_id,
-        username=username,
-    )
+    command = SetUserUsername(user_id=user_id.value, username=new_username)
+    await handler(command)
 
-    result = await handler(command)
-
-    assert isinstance(result, dto.User)
-    assert result.id == user_id
-    assert result.username == username
-    assert result.first_name == user.full_name.first_name
-    assert result.last_name == user.full_name.last_name
-    assert result.middle_name == user.full_name.middle_name
+    assert user.id == user_id
+    assert user.username == Username(new_username)
+    assert user.full_name == full_name
 
     assert len(event_mediator.published_events) == 1
     published_event = event_mediator.published_events[0]
     assert isinstance(published_event, UsernameUpdated)
-    assert published_event.user_id == user_id
-    assert published_event.username == username
+    assert published_event.user_id == user_id.value
+    assert published_event.username == new_username
 
     assert uow.committed is True
 
@@ -55,19 +50,25 @@ async def test_set_user_username_handler_username_exists(
 ) -> None:
     handler = SetUserUsernameHandler(user_repo, uow, event_mediator)
 
-    user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
-    username = "john_doe"
+    user_id = UserId(UUID("123e4567-e89b-12d3-a456-426614174000"))
+    old_username = Username("old_username")
+    new_username = "new_username"
+    full_name = FullName("John", "Doe")
     user = User(
-        id=UserId(user_id),
-        username=Username(username),
-        full_name=FullName("John", "Doe"),
+        id=user_id,
+        username=old_username,
+        full_name=full_name,
+        existing_usernames={old_username, Username(new_username)},
+    )
+    user2 = User(
+        id=UserId(UUID("123e4567-e89b-12d3-a456-426614174001")),
+        username=Username(new_username),
+        full_name=full_name,
     )
     await user_repo.add_user(user)
+    await user_repo.add_user(user2)
 
-    command = SetUserUsername(
-        user_id=user_id,
-        username=username,
-    )
+    command = SetUserUsername(user_id=user_id.value, username=new_username)
 
     with pytest.raises(UsernameAlreadyExists):
         await handler(command)
@@ -83,12 +84,9 @@ async def test_set_user_username_handler_user_not_found(
     handler = SetUserUsernameHandler(user_repo, uow, event_mediator)
 
     user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
-    username = "john_doe"
+    new_username = "john_doe"
 
-    command = SetUserUsername(
-        user_id=user_id,
-        username=username,
-    )
+    command = SetUserUsername(user_id=user_id, username=new_username)
 
     with pytest.raises(UserIdNotExist):
         await handler(command)
@@ -103,20 +101,20 @@ async def test_set_user_username_handler_user_deleted(
 ) -> None:
     handler = SetUserUsernameHandler(user_repo, uow, event_mediator)
 
-    user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
-    username = "john_doe"
+    user_id = UserId(UUID("123e4567-e89b-12d3-a456-426614174000"))
+    old_username = Username("old_username")
+    new_username = "new_username"
+    full_name = FullName("John", "Doe")
     user = User(
-        id=UserId(user_id),
-        username=None,
-        full_name=FullName("John", "Doe"),
+        id=user_id,
+        username=old_username,
+        full_name=full_name,
+        existing_usernames={old_username},
     )
     user.delete()
     await user_repo.add_user(user)
 
-    command = SetUserUsername(
-        user_id=user_id,
-        username=username,
-    )
+    command = SetUserUsername(user_id=user_id.value, username=new_username)
 
     with pytest.raises(UserIsDeleted):
         await handler(command)

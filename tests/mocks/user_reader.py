@@ -1,10 +1,11 @@
 from collections.abc import Sequence
 from uuid import UUID
 
+from src.application.common.pagination.dto import Pagination, PaginationResult, SortOrder
 from src.application.user import dto
 from src.application.user.exceptions import UserIdNotExist, UsernameNotExist
 from src.application.user.interfaces import UserReader
-from src.application.user.interfaces.persistence import GetUsersFilters, GetUsersOrder
+from src.application.user.interfaces.persistence import GetUsersFilters
 from src.domain.common.constants import Empty
 
 
@@ -25,24 +26,31 @@ class UserReaderMock(UserReader):
                 return user
         raise UsernameNotExist(username)
 
-    async def get_users(self, filters: GetUsersFilters) -> list[dto.UserDTOs]:
+    async def get_users(self, filters: GetUsersFilters, pagination: Pagination) -> dto.Users:
         users = list(self.users.values())
         if filters.deleted is not Empty.UNSET:
-            users = [user for user in users if user.deleted == filters.deleted]
-        if filters.order == GetUsersOrder.ASC:
+            if filters.deleted is True:
+                users = [user for user in users if user.deleted_at is not None]
+            else:
+                users = [user for user in users if user.deleted_at is None]
+        if pagination.order == SortOrder.ASC:
             users.sort(key=lambda user: user.id)
         else:
             users.sort(key=lambda user: user.id, reverse=True)
 
-        offset = filters.offset if filters.offset is not Empty.UNSET else 0
-        limit = filters.limit if filters.limit is not Empty.UNSET else len(users)
+        offset = pagination.offset if pagination.offset is not Empty.UNSET else 0
+        limit = pagination.limit if pagination.limit is not Empty.UNSET else len(users)
         last_index = offset + limit
         users = users[offset:last_index]
-        return users
+        users_count = await self._get_users_count(filters)
+        return dto.Users(data=users, pagination=PaginationResult.from_pagination(pagination, total=users_count))
 
-    async def get_users_count(self, deleted: bool | Empty = Empty.UNSET) -> int:
-        if deleted is not Empty.UNSET:
-            count = sum(1 for user in self.users.values() if user.deleted is deleted)
+    async def _get_users_count(self, filters: GetUsersFilters) -> int:
+        if filters.deleted is not Empty.UNSET:
+            if filters.deleted is True:
+                count = sum(1 for user in self.users.values() if user.deleted_at is not None)
+            else:
+                count = sum(1 for user in self.users.values() if user.deleted_at is None)
         else:
             count = len(self.users)
         return count
