@@ -19,8 +19,5 @@ class BaseValueObject(ABC):
 class ValueObject(BaseValueObject, ABC, Generic[V]):
     value: V
 
-    def __str__(self) -> str:
-        return str(self.value)
-
-    def __int__(self) -> int:
-        return int(self.value)
+    def to_raw(self) -> V:
+        return self.value

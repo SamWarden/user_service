@@ -14,7 +14,7 @@ class WrongNameValue(ValueError, DomainException):
     text: str
 
     @property
-    def message(self) -> str:
+    def title(self) -> str:
         return self.text
 
 
