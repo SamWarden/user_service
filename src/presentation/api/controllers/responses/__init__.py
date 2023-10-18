@@ -1,7 +1,3 @@
-from .exceptions import ErrorResult
-from .user import Users
+from .base import ErrorResponse
 
-__all__ = (
-    "ErrorResult",
-    "Users",
-)
+__all__ = ("ErrorResponse",)

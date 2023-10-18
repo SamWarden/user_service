@@ -1,22 +1,23 @@
 from typing import Annotated, Union
 from uuid import UUID
 
-from didiator import CommandMediator, QueryMediator
+from didiator import CommandMediator, Mediator, QueryMediator
 from fastapi import APIRouter, Depends, Query, status
 
+from src.application.common.pagination.dto import Pagination, SortOrder
 from src.application.user import dto
 from src.application.user.commands import CreateUser, DeleteUser, SetUserFullName
 from src.application.user.commands.set_user_username import SetUserUsername
-from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameAlreadyExists, UsernameNotExist
-from src.application.user.interfaces.persistence import GetUsersOrder
+from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameNotExist
+from src.application.user.interfaces.persistence import GetUsersFilters
 from src.application.user.queries import GetUserById, GetUserByUsername, GetUsers
 from src.domain.common.constants import Empty
-from src.domain.user.exceptions import UserIsDeleted
+from src.domain.user.exceptions import UserIsDeleted, UsernameAlreadyExists
 from src.domain.user.value_objects.full_name import EmptyName, TooLongName, WrongNameFormat
 from src.domain.user.value_objects.username import EmptyUsername, TooLongUsername, WrongUsernameFormat
-from src.presentation.api.controllers import requests, responses
-from src.presentation.api.controllers.responses import ErrorResult
-from src.presentation.api.converters import convert_dto_to_users_response
+from src.presentation.api.controllers import requests
+from src.presentation.api.controllers.responses import ErrorResponse
+from src.presentation.api.controllers.responses.base import OkResponse
 from src.presentation.api.providers.stub import Stub
 
 user_router = APIRouter(
@@ -30,72 +31,75 @@ user_router = APIRouter(
     responses={
         status.HTTP_201_CREATED: {"model": dto.User},
         status.HTTP_400_BAD_REQUEST: {
-            "model": ErrorResult[Union[TooLongUsername, EmptyUsername, WrongUsernameFormat]],
+            "model": ErrorResponse[Union[TooLongUsername, EmptyUsername, WrongUsernameFormat]],
         },
         status.HTTP_409_CONFLICT: {
-            "model": ErrorResult[Union[UsernameAlreadyExists, UserIdAlreadyExists]],
+            "model": ErrorResponse[Union[UsernameAlreadyExists, UserIdAlreadyExists]],
         },
     },
     status_code=status.HTTP_201_CREATED,
 )
 async def create_user(
     create_user_command: CreateUser,
-    mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
-) -> dto.User:
-    user = await mediator.send(create_user_command)
-    return user
+    mediator: Annotated[Mediator, Depends(Stub(Mediator))],
+) -> OkResponse[dto.UserDTOs]:
+    user_id = await mediator.send(create_user_command)
+    user = await mediator.query(GetUserById(user_id=user_id))
+    return OkResponse(result=user)
 
 
 @user_router.get(
     "/@{username}",
     responses={
         status.HTTP_200_OK: {"model": dto.User},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResult[UsernameNotExist]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UsernameNotExist]},
     },
 )
 async def get_user_by_username(
     username: str,
     mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
-) -> dto.User:
+) -> OkResponse[dto.User]:
     user = await mediator.query(GetUserByUsername(username=username))
-    return user
+    return OkResponse(result=user)
 
 
 @user_router.get(
     "/{user_id}",
     responses={
         status.HTTP_200_OK: {"model": dto.UserDTOs},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResult[UserIdNotExist]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserIdNotExist]},
     },
 )
 async def get_user_by_id(
     user_id: UUID,
     mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
-) -> dto.UserDTOs:
+) -> OkResponse[dto.UserDTOs]:
     user = await mediator.query(GetUserById(user_id=user_id))
-    return user
+    return OkResponse(result=user)
 
 
 @user_router.get(
     "/",
-    description="Return all users",
 )
 async def get_users(
     mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
     deleted: bool | None = None,
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=0, le=1000)] = 1000,
-    order: GetUsersOrder = GetUsersOrder.ASC,
-) -> responses.Users:
+    order: SortOrder = SortOrder.ASC,
+) -> OkResponse[dto.Users]:
+    """Return all users"""
     users = await mediator.query(
         GetUsers(
-            deleted=deleted if deleted is not None else Empty.UNSET,
-            offset=offset,
-            limit=limit,
-            order=order,
+            filters=GetUsersFilters(deleted if deleted is not None else Empty.UNSET),
+            pagination=Pagination(
+                offset=offset,
+                limit=limit,
+                order=order,
+            ),
         )
     )
-    return convert_dto_to_users_response(users)
+    return OkResponse(result=users)
 
 
 @user_router.put(
@@ -103,19 +107,19 @@ async def get_users(
     responses={
         status.HTTP_200_OK: {"model": dto.User},
         status.HTTP_400_BAD_REQUEST: {
-            "model": ErrorResult[Union[UserIdNotExist, TooLongUsername, EmptyUsername, WrongUsernameFormat]],
+            "model": ErrorResponse[Union[UserIdNotExist, TooLongUsername, EmptyUsername, WrongUsernameFormat]],
         },
-        status.HTTP_409_CONFLICT: {"model": ErrorResult[Union[UserIsDeleted, UsernameAlreadyExists]]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[Union[UserIsDeleted, UsernameAlreadyExists]]},
     },
 )
 async def set_user_username(
     user_id: UUID,
     set_user_username_data: requests.SetUserUsernameData,
     mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
-) -> dto.User:
+) -> OkResponse[None]:
     set_user_username_command = SetUserUsername(user_id=user_id, username=set_user_username_data.username)
-    user = await mediator.send(set_user_username_command)
-    return user
+    await mediator.send(set_user_username_command)
+    return OkResponse()
 
 
 @user_router.put(
@@ -123,37 +127,37 @@ async def set_user_username(
     responses={
         status.HTTP_200_OK: {"model": dto.User},
         status.HTTP_400_BAD_REQUEST: {
-            "model": ErrorResult[Union[UserIdNotExist, EmptyName, WrongNameFormat, TooLongName]],
+            "model": ErrorResponse[Union[UserIdNotExist, EmptyName, WrongNameFormat, TooLongName]],
         },
-        status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[UserIsDeleted]},
     },
 )
 async def set_user_full_name(
     user_id: UUID,
     set_user_full_name_data: requests.SetUserFullNameData,
     mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
-) -> dto.User:
+) -> OkResponse[None]:
     set_user_full_name_command = SetUserFullName(
         user_id=user_id,
         first_name=set_user_full_name_data.first_name,
         last_name=set_user_full_name_data.last_name,
         middle_name=set_user_full_name_data.middle_name,
     )
-    user = await mediator.send(set_user_full_name_command)
-    return user
+    await mediator.send(set_user_full_name_command)
+    return OkResponse()
 
 
 @user_router.delete(
     "/{user_id}",
     responses={
         status.HTTP_200_OK: {"model": dto.DeletedUser},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResult[UserIdNotExist]},
-        status.HTTP_409_CONFLICT: {"model": ErrorResult[UserIsDeleted]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserIdNotExist]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[UserIsDeleted]},
     },
 )
 async def delete_user(
     user_id: UUID,
     mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
-) -> dto.DeletedUser:
-    deleted_user = await mediator.send(DeleteUser(user_id=user_id))
-    return deleted_user
+) -> OkResponse[None]:
+    await mediator.send(DeleteUser(user_id=user_id))
+    return OkResponse()
