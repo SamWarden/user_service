@@ -7,7 +7,6 @@ from didiator import EventMediator
 from src.application.common.command import Command, CommandHandler
 from src.application.common.interfaces.uow import UnitOfWork
 from src.application.user import dto
-from src.application.user.converters import convert_active_user_entity_to_dto
 from src.application.user.interfaces import UserRepo
 from src.domain.user.value_objects import FullName, UserId
 
@@ -22,7 +21,7 @@ class SetUserFullName(Command[dto.User]):
     middle_name: str | None
 
 
-class SetUserFullNameHandler(CommandHandler[SetUserFullName, dto.User]):
+class SetUserFullNameHandler(CommandHandler[SetUserFullName, None]):
     def __init__(
         self,
         user_repo: UserRepo,
@@ -33,7 +32,7 @@ class SetUserFullNameHandler(CommandHandler[SetUserFullName, dto.User]):
         self._uow = uow
         self._mediator = mediator
 
-    async def __call__(self, command: SetUserFullName) -> dto.User:
+    async def __call__(self, command: SetUserFullName) -> None:
         user_id = UserId(command.user_id)
         full_name = FullName(command.first_name, command.last_name, command.middle_name)
 
@@ -44,6 +43,3 @@ class SetUserFullNameHandler(CommandHandler[SetUserFullName, dto.User]):
         await self._uow.commit()
 
         logger.info("Full name updated", extra={"user": user})
-
-        user_dto = convert_active_user_entity_to_dto(user)
-        return user_dto

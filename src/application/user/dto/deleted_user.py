@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Literal
+from datetime import datetime
 from uuid import UUID
 
 from src.application.common.dto import DTO
@@ -11,7 +11,8 @@ class DeletedUser(DTO):
     first_name: str
     last_name: str
     middle_name: str | None
-    deleted: Literal[True] = field(default=True, init=False)
+    deleted_at: datetime
+    username: None = field(init=False, default=None)
 
     @property
     def full_name(self) -> str:

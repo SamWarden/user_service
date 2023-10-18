@@ -6,8 +6,6 @@ from didiator import EventMediator
 
 from src.application.common.command import Command, CommandHandler
 from src.application.common.interfaces.uow import UnitOfWork
-from src.application.user import dto
-from src.application.user.converters import convert_deleted_user_entity_to_dto
 from src.application.user.interfaces import UserRepo
 from src.domain.user.value_objects import UserId
 
@@ -15,11 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class DeleteUser(Command[dto.DeletedUser]):
+class DeleteUser(Command[None]):
     user_id: UUID
 
 
-class DeleteUserHandler(CommandHandler[DeleteUser, dto.DeletedUser]):
+class DeleteUserHandler(CommandHandler[DeleteUser, None]):
     def __init__(
         self,
         user_repo: UserRepo,
@@ -30,7 +28,7 @@ class DeleteUserHandler(CommandHandler[DeleteUser, dto.DeletedUser]):
         self._uow = uow
         self._mediator = mediator
 
-    async def __call__(self, command: DeleteUser) -> dto.DeletedUser:
+    async def __call__(self, command: DeleteUser) -> None:
         user_id = UserId(command.user_id)
 
         user = await self._user_repo.acquire_user_by_id(user_id)
@@ -40,6 +38,3 @@ class DeleteUserHandler(CommandHandler[DeleteUser, dto.DeletedUser]):
         await self._uow.commit()
 
         logger.info("User deleted", extra={"user": user})
-
-        user_dto = convert_deleted_user_entity_to_dto(user)
-        return user_dto

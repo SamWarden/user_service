@@ -1,16 +1,9 @@
-from dataclasses import dataclass
+from typing import TypeAlias
 
-from src.domain.common.constants import Empty
+from src.application.common.pagination.dto import PaginatedItemsDTO
 
 from .deleted_user import DeletedUser
 from .user import User
 
-UserDTOs = User | DeletedUser
-
-
-@dataclass(frozen=True)
-class Users:
-    users: list[UserDTOs]
-    total: int
-    offset: int | Empty = Empty.UNSET
-    limit: int | Empty = Empty.UNSET
+UserDTOs: TypeAlias = User | DeletedUser
+Users: TypeAlias = PaginatedItemsDTO[UserDTOs]
