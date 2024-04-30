@@ -1,5 +1,6 @@
 """
-Test can find forgotten downgrade methods, undeleted data types in downgrade
+Test can find forgotten downgrade methods, undeleted data types in downgrade.
+
 methods, typos and many other errors.
 Does not require any maintenance - you just add it once to check 80% of typos
 and mistakes in migrations forever.
@@ -23,7 +24,7 @@ def get_revisions(alembic_config: AlembicConfig) -> list[Script]:
 
 
 @pytest.fixture(scope="module", autouse=True)
-def drop_db(alembic_config: AlembicConfig) -> None:
+def _drop_db(alembic_config: AlembicConfig) -> None:
     downgrade(alembic_config, "base")
 
 

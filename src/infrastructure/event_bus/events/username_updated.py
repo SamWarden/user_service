@@ -8,6 +8,6 @@ from .base import IntegrationEvent, integration_event
 
 @dataclass(frozen=True)
 @integration_event("UsernameUpdated", exchange=USER_EXCHANGE)
-class UsernameUpdated(IntegrationEvent):  # noqa
+class UsernameUpdated(IntegrationEvent):
     user_id: UUID
     username: str

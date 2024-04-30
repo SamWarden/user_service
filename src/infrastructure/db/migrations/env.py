@@ -63,7 +63,7 @@ async def run_async_migrations() -> None:
             poolclass=pool.NullPool,
             future=True,
             url=full_url,
-        )
+        ),
     )
 
     async with connectable.connect() as connection:
@@ -74,6 +74,7 @@ async def run_async_migrations() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
+
     In this scenario we need to create an Engine
     and associate a connection with the context.
     """

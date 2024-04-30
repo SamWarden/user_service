@@ -1,4 +1,4 @@
-"""Add "deleted_at" column to the "users" table
+"""Add "deleted_at" column to the "users" table.
 
 Revision ID: 36112198c668
 Revises: adbf32e55780

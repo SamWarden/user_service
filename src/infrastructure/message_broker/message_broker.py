@@ -29,7 +29,7 @@ class MessageBrokerImpl(MessageBroker):
     @staticmethod
     def build_message(message: Message) -> aio_pika.Message:
         return aio_pika.Message(
-            body=orjson.dumps(dict(message_type=message.message_type, data=message.data)),
+            body=orjson.dumps({"message_type": message.message_type, "data": message.data}),
             message_id=str(message.id),
             content_type="application/json",
             delivery_mode=aio_pika.DeliveryMode.PERSISTENT,

@@ -20,9 +20,7 @@ class BaseModel(DeclarativeBase):
 
 
 class TimedBaseModel(BaseModel):
-    """
-    An abstract base model that adds created_at and updated_at timestamp fields to the model
-    """
+    """An abstract base model that adds created_at and updated_at timestamp fields to the model."""
 
     __abstract__ = True
 

@@ -16,7 +16,7 @@ ProcessorType = Callable[
 ]
 
 
-def additionally_serialize(obj: Any) -> Any:
+def additionally_serialize(obj: object) -> Any:
     if isinstance(obj, UUID):
         return str(obj)
     if isinstance(obj, aio_pika.Message):

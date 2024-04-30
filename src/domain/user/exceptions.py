@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from src.domain.common.exceptions import DomainException
+from src.domain.common.exceptions import DomainError
 
 
 @dataclass(eq=False)
-class UserIsDeleted(RuntimeError, DomainException):
+class UserIsDeletedError(RuntimeError, DomainError):
     user_id: UUID
 
     @property
@@ -14,12 +14,11 @@ class UserIsDeleted(RuntimeError, DomainException):
 
 
 @dataclass(eq=False)
-class UsernameAlreadyExists(DomainException):
+class UsernameAlreadyExistsError(DomainError):
     username: str | None = None
 
     @property
     def title(self) -> str:
-        if self.username is not None:
-            return f'A user with the "{self.username}" username already exists'
-        else:
+        if self.username is None:
             return "A user with the username already exists"
+        return f'A user with the "{self.username}" username already exists'

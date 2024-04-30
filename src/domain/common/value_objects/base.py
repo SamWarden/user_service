@@ -11,8 +11,7 @@ class BaseValueObject(ABC):
         self._validate()
 
     def _validate(self) -> None:
-        """This method checks that a value is valid to create this value object"""
-        pass
+        """Check that a value is valid to create this value object."""
 
 
 @dataclass(frozen=True)

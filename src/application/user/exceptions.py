@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from src.application.common.exceptions import ApplicationException
+from src.application.common.exceptions import ApplicationError
 
 
 @dataclass(eq=False)
-class UserIdAlreadyExists(ApplicationException):
+class UserIdAlreadyExistsError(ApplicationError):
     user_id: UUID
 
     @property
@@ -14,7 +14,7 @@ class UserIdAlreadyExists(ApplicationException):
 
 
 @dataclass(eq=False)
-class UserIdNotExist(ApplicationException):
+class UserIdNotExistError(ApplicationError):
     user_id: UUID
 
     @property
@@ -23,7 +23,7 @@ class UserIdNotExist(ApplicationException):
 
 
 @dataclass(eq=False)
-class UsernameNotExist(ApplicationException):
+class UsernameNotExistError(ApplicationError):
     username: str
 
     @property

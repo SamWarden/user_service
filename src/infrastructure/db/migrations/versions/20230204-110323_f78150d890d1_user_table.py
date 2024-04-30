@@ -1,4 +1,4 @@
-"""User table
+"""User table.
 
 Revision ID: f78150d890d1
 Revises: 2d79505fb3d2

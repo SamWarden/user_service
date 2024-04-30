@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 import pytest
@@ -11,7 +11,7 @@ from src.domain.common.constants import Empty
 from tests.mocks.user_reader import UserReaderMock
 
 
-@pytest.fixture
+@pytest.fixture()
 def users() -> list[dto.UserDTOs]:
     users: list[dto.UserDTOs] = [
         dto.User(
@@ -26,7 +26,7 @@ def users() -> list[dto.UserDTOs]:
             first_name="Jane",
             last_name="Smith",
             middle_name=None,
-            deleted_at=datetime.now(timezone.utc),
+            deleted_at=datetime.now(UTC),
         ),
     ]
     return users

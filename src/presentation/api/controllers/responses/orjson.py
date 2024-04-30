@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def additionally_serialize(obj: Any) -> Any:
-    match obj:  # noqa: E999
+    match obj:
         case Exception():
             text = obj.args[0] if len(obj.args) > 0 else "Unknown error"
             return f"{obj.__class__.__name__}: {text}"

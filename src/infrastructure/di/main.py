@@ -60,7 +60,7 @@ def setup_db_factories(di_builder: DiBuilder) -> None:
         bind_by_type(
             Dependent(build_sa_session_factory, scope=DiScope.APP),
             async_sessionmaker[AsyncSession],
-        )
+        ),
     )
     di_builder.bind(bind_by_type(Dependent(build_sa_session, scope=DiScope.REQUEST), AsyncSession))
     di_builder.bind(bind_by_type(Dependent(UserRepoImpl, scope=DiScope.REQUEST), UserRepo, covariant=True))
@@ -72,25 +72,25 @@ def setup_event_bus_factories(di_builder: DiBuilder) -> None:
         bind_by_type(
             Dependent(build_rq_connection_pool, scope=DiScope.APP),
             aio_pika.pool.Pool[aio_pika.abc.AbstractConnection],
-        )
+        ),
     )
     di_builder.bind(
         bind_by_type(
             Dependent(build_rq_channel_pool, scope=DiScope.APP),
             aio_pika.pool.Pool[aio_pika.abc.AbstractChannel],
-        )
+        ),
     )
     di_builder.bind(
         bind_by_type(
             Dependent(build_rq_channel, scope=DiScope.REQUEST),
             aio_pika.abc.AbstractChannel,
-        )
+        ),
     )
     di_builder.bind(
         bind_by_type(
             Dependent(build_rq_transaction, scope=DiScope.REQUEST),
             aio_pika.abc.AbstractTransaction,
-        )
+        ),
     )
     di_builder.bind(bind_by_type(Dependent(MessageBrokerImpl, scope=DiScope.REQUEST), MessageBroker))
     di_builder.bind(bind_by_type(Dependent(EventBusImpl, scope=DiScope.REQUEST), EventBusImpl))

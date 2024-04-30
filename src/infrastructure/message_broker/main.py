@@ -1,4 +1,4 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import aio_pika
 from aio_pika.pool import Pool

@@ -2,7 +2,7 @@ from src.application.common.interfaces.uow import UnitOfWork
 
 
 class UnitOfWorkMock(UnitOfWork):
-    def __init__(self):
+    def __init__(self) -> None:
         self.committed = False
         self.rolled_back = False
 

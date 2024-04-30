@@ -1,6 +1,6 @@
-from .base import AppException, DomainException
+from .base import AppError, DomainError
 
 __all__ = (
-    "AppException",
-    "DomainException",
+    "AppError",
+    "DomainError",
 )

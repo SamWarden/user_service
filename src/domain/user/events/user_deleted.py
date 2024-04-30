@@ -5,5 +5,5 @@ from src.domain.common.events.event import Event
 
 
 @dataclasses.dataclass(frozen=True)
-class UserDeleted(Event):  # noqa
+class UserDeleted(Event):
     user_id: UUID
