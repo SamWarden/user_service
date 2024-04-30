@@ -4,6 +4,7 @@ services:
   api:
     profiles: [ "api" ]
     container_name: user_service.api
+    image: user_service
     build:
       context: .
     restart: unless-stopped
@@ -34,6 +35,7 @@ services:
   postgres_migration:
     profiles: [ "migration" ]
     container_name: user_service.postgres_migration
+    image: user_service
     build:
       context: .
     restart: on-failure
@@ -53,7 +55,7 @@ services:
   postgres:
     profiles: [ "api", "migration" ]
     container_name: user_service.postgres
-    image: "postgres:15-alpine"
+    image: "postgres:16-alpine"
     hostname: user_service.postgres
     restart: unless-stopped
     expose:
