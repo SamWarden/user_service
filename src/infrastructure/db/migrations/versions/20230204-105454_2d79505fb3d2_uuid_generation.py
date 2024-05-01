@@ -1,4 +1,4 @@
-"""UUID generation
+"""UUID generation.
 
 Revision ID: 2d79505fb3d2
 Revises:
@@ -46,7 +46,7 @@ def upgrade() -> None:
         $$
         language plpgsql
         volatile;
-    """
+    """,
     )
     op.execute(
         """
@@ -82,7 +82,7 @@ def upgrade() -> None:
         $$
         language plpgsql
         volatile;
-    """
+    """,
     )
 
 

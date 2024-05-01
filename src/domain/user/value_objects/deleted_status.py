@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Self
 
 from src.domain.common.value_objects import ValueObject
@@ -9,7 +9,7 @@ class DeletionTime(ValueObject[datetime | None]):
 
     @classmethod
     def create_deleted(cls) -> Self:
-        return cls(datetime.now(timezone.utc))
+        return cls(datetime.now(UTC))
 
     @classmethod
     def create_not_deleted(cls) -> Self:

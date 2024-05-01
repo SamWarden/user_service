@@ -3,7 +3,7 @@ from uuid import UUID
 import pytest
 
 from src.application.user import dto
-from src.application.user.exceptions import UserIdNotExist
+from src.application.user.exceptions import UserIdNotExistError
 from src.application.user.queries.get_user_by_id import GetUserById, GetUserByIdHandler
 from tests.mocks.user_reader import UserReaderMock
 
@@ -41,5 +41,5 @@ async def test_get_user_by_id_handler_user_not_found(user_reader: UserReaderMock
     non_existent_user_id = UUID("00000000-0000-0000-0000-000000000000")
     query = GetUserById(user_id=non_existent_user_id)
 
-    with pytest.raises(UserIdNotExist):
+    with pytest.raises(UserIdNotExistError):
         await handler(query)

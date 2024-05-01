@@ -6,7 +6,7 @@ from src.domain.user.events import FullNameUpdated
 from src.domain.user.events.user_created import UserCreated
 from src.domain.user.events.user_deleted import UserDeleted
 from src.domain.user.events.username_updated import UsernameUpdated
-from src.domain.user.exceptions import UserIsDeleted, UsernameAlreadyExists
+from src.domain.user.exceptions import UserIsDeletedError, UsernameAlreadyExistsError
 from src.domain.user.value_objects import FullName, UserId, Username
 from src.domain.user.value_objects.deleted_status import DeletionTime
 
@@ -21,10 +21,14 @@ class User(AggregateRoot):
 
     @classmethod
     def create(
-        cls, user_id: UserId, username: Username, full_name: FullName, existing_usernames: set[Username]
+        cls,
+        user_id: UserId,
+        username: Username,
+        full_name: FullName,
+        existing_usernames: set[Username],
     ) -> Self:
         if username in existing_usernames:
-            raise UsernameAlreadyExists(username.to_raw())
+            raise UsernameAlreadyExistsError(username.to_raw())
 
         existing_usernames.add(username)
         user = cls(user_id, username, full_name, existing_usernames)
@@ -35,7 +39,7 @@ class User(AggregateRoot):
                 full_name.first_name,
                 full_name.last_name,
                 full_name.middle_name,
-            )
+            ),
         )
         return user
 
@@ -44,7 +48,7 @@ class User(AggregateRoot):
 
         if username != self.username:
             if username in self.existing_usernames:
-                raise UsernameAlreadyExists(username.to_raw())
+                raise UsernameAlreadyExistsError(username.to_raw())
 
             self.existing_usernames.remove(self.username)
             self.existing_usernames.add(username)
@@ -61,7 +65,7 @@ class User(AggregateRoot):
                 self.full_name.first_name,
                 self.full_name.last_name,
                 self.full_name.middle_name,
-            )
+            ),
         )
 
     def delete(self) -> None:
@@ -74,4 +78,4 @@ class User(AggregateRoot):
 
     def _validate_not_deleted(self) -> None:
         if self.deleted_at.is_deleted():
-            raise UserIsDeleted(self.id.to_raw())
+            raise UserIsDeletedError(self.id.to_raw())

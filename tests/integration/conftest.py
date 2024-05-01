@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Generator
 
 import orjson
 import pytest
@@ -35,7 +35,7 @@ def alembic_config(postgres_url: str) -> AlembicConfig:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def upgrade_schema_db(alembic_config: AlembicConfig) -> None:
+def _upgrade_schema_db(alembic_config: AlembicConfig) -> None:
     upgrade(alembic_config, "head")
 
 
@@ -47,7 +47,9 @@ async def session_factory(postgres_url: str) -> AsyncGenerator[async_sessionmake
         json_deserializer=orjson.loads,
     )
     session_factory_: async_sessionmaker[AsyncSession] = async_sessionmaker(
-        bind=engine, expire_on_commit=False, autoflush=False
+        bind=engine,
+        expire_on_commit=False,
+        autoflush=False,
     )
     yield session_factory_
     await engine.dispose()

@@ -16,7 +16,7 @@ def get_di_state() -> ScopeState:
 
 
 class StateProvider:
-    def __init__(self, di_state: ScopeState | None = None):
+    def __init__(self, di_state: ScopeState | None = None) -> None:
         self._di_state = di_state
 
     async def build(

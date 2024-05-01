@@ -1,17 +1,17 @@
 from dataclasses import dataclass
 
-from src.domain.common.exceptions import AppException
+from src.domain.common.exceptions import AppError
 
 
-class ApplicationException(AppException):
-    """Base Application Exception"""
+class ApplicationError(AppError):
+    """Base Application Exception."""
 
     @property
     def title(self) -> str:
         return "An application error occurred"
 
 
-class UnexpectedError(ApplicationException):
+class UnexpectedError(ApplicationError):
     pass
 
 
@@ -28,7 +28,7 @@ class RepoError(UnexpectedError):
 
 
 @dataclass(eq=False)
-class MappingError(ApplicationException):
+class MappingError(ApplicationError):
     _text: str
 
     @property

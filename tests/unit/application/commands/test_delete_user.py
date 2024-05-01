@@ -3,10 +3,10 @@ from uuid import UUID
 import pytest
 
 from src.application.user.commands import DeleteUser, DeleteUserHandler
-from src.application.user.exceptions import UserIdNotExist
+from src.application.user.exceptions import UserIdNotExistError
 from src.domain.user import User
 from src.domain.user.events import UserDeleted
-from src.domain.user.exceptions import UserIsDeleted
+from src.domain.user.exceptions import UserIsDeletedError
 from src.domain.user.value_objects import FullName, UserId, Username
 from src.domain.user.value_objects.deleted_status import DeletionTime
 from tests.mocks import EventMediatorMock, UserRepoMock
@@ -14,7 +14,9 @@ from tests.mocks.uow import UnitOfWorkMock
 
 
 async def test_delete_user_handler_success(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = DeleteUserHandler(user_repo, uow, event_mediator)
 
@@ -47,7 +49,9 @@ async def test_delete_user_handler_success(
 
 
 async def test_delete_user_handler_user_not_found(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = DeleteUserHandler(user_repo, uow, event_mediator)
 
@@ -55,7 +59,7 @@ async def test_delete_user_handler_user_not_found(
 
     command = DeleteUser(user_id=user_id)
 
-    with pytest.raises(UserIdNotExist):
+    with pytest.raises(UserIdNotExistError):
         await handler(command)
 
     assert len(event_mediator.published_events) == 0
@@ -64,7 +68,9 @@ async def test_delete_user_handler_user_not_found(
 
 
 async def test_delete_user_handler_user_already_deleted(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = DeleteUserHandler(user_repo, uow, event_mediator)
 
@@ -80,7 +86,7 @@ async def test_delete_user_handler_user_already_deleted(
 
     command = DeleteUser(user_id=user_id)
 
-    with pytest.raises(UserIsDeleted):
+    with pytest.raises(UserIsDeletedError):
         await handler(command)
 
     assert len(event_mediator.published_events) == 0

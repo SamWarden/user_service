@@ -1,4 +1,4 @@
-"""Add middle_name column to "users" table
+"""Add middle_name column to "users" table.
 
 Revision ID: adbf32e55780
 Revises: f78150d890d1

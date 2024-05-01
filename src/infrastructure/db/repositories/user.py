@@ -8,11 +8,11 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from src.application.common.exceptions import RepoError
 from src.application.common.pagination.dto import Pagination, PaginationResult, SortOrder
 from src.application.user import dto
-from src.application.user.exceptions import UserIdAlreadyExists, UserIdNotExist, UsernameNotExist
+from src.application.user.exceptions import UserIdAlreadyExistsError, UserIdNotExistError, UsernameNotExistError
 from src.application.user.interfaces.persistence import GetUsersFilters, UserReader, UserRepo
 from src.domain.common.constants import Empty
 from src.domain.user import entities
-from src.domain.user.exceptions import UsernameAlreadyExists
+from src.domain.user.exceptions import UsernameAlreadyExistsError
 from src.domain.user.value_objects import UserId, Username
 from src.infrastructure.db.converters import (
     convert_db_model_to_active_user_dto,
@@ -30,7 +30,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
     async def get_user_by_id(self, user_id: UUID) -> dto.UserDTOs:
         user: User | None = await self._session.get(User, user_id)
         if user is None:
-            raise UserIdNotExist(user_id)
+            raise UserIdNotExistError(user_id)
 
         return convert_db_model_to_user_dto(user)
 
@@ -38,7 +38,7 @@ class UserReaderImpl(SQLAlchemyRepo, UserReader):
     async def get_user_by_username(self, username: str) -> dto.User:
         user: User | None = await self._session.scalar(select(User).where(User.username == username))
         if user is None:
-            raise UsernameNotExist(username)
+            raise UsernameNotExistError(username)
 
         return convert_db_model_to_active_user_dto(user)
 
@@ -85,7 +85,7 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     async def acquire_user_by_id(self, user_id: UserId) -> entities.User:
         user: User | None = await self._session.get(User, user_id.to_raw(), with_for_update=True)
         if user is None:
-            raise UserIdNotExist(user_id.to_raw())
+            raise UserIdNotExistError(user_id.to_raw())
 
         existing_usernames = await self.get_existing_usernames()
         return convert_db_model_to_user_entity(user, existing_usernames)
@@ -116,8 +116,8 @@ class UserRepoImpl(SQLAlchemyRepo, UserRepo):
     def _parse_error(self, err: DBAPIError, user: entities.User) -> NoReturn:
         match err.__cause__.__cause__.constraint_name:  # type: ignore
             case "pk_users":
-                raise UserIdAlreadyExists(user.id.to_raw()) from err
+                raise UserIdAlreadyExistsError(user.id.to_raw()) from err
             case "uq_users_username":
-                raise UsernameAlreadyExists(str(user.username)) from err
+                raise UsernameAlreadyExistsError(str(user.username)) from err
             case _:
                 raise RepoError from err

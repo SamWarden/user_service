@@ -3,17 +3,19 @@ from uuid import UUID
 import pytest
 
 from src.application.user.commands import SetUserUsername, SetUserUsernameHandler
-from src.application.user.exceptions import UserIdNotExist
+from src.application.user.exceptions import UserIdNotExistError
 from src.domain.user import User
 from src.domain.user.events import UsernameUpdated
-from src.domain.user.exceptions import UserIsDeleted, UsernameAlreadyExists
+from src.domain.user.exceptions import UserIsDeletedError, UsernameAlreadyExistsError
 from src.domain.user.value_objects import FullName, UserId, Username
 from tests.mocks import EventMediatorMock, UserRepoMock
 from tests.mocks.uow import UnitOfWorkMock
 
 
 async def test_set_user_username_handler_success(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = SetUserUsernameHandler(user_repo, uow, event_mediator)
 
@@ -46,7 +48,9 @@ async def test_set_user_username_handler_success(
 
 
 async def test_set_user_username_handler_username_exists(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = SetUserUsernameHandler(user_repo, uow, event_mediator)
 
@@ -70,7 +74,7 @@ async def test_set_user_username_handler_username_exists(
 
     command = SetUserUsername(user_id=user_id.value, username=new_username)
 
-    with pytest.raises(UsernameAlreadyExists):
+    with pytest.raises(UsernameAlreadyExistsError):
         await handler(command)
 
     assert len(event_mediator.published_events) == 0
@@ -79,7 +83,9 @@ async def test_set_user_username_handler_username_exists(
 
 
 async def test_set_user_username_handler_user_not_found(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = SetUserUsernameHandler(user_repo, uow, event_mediator)
 
@@ -88,7 +94,7 @@ async def test_set_user_username_handler_user_not_found(
 
     command = SetUserUsername(user_id=user_id, username=new_username)
 
-    with pytest.raises(UserIdNotExist):
+    with pytest.raises(UserIdNotExistError):
         await handler(command)
 
     assert len(event_mediator.published_events) == 0
@@ -97,7 +103,9 @@ async def test_set_user_username_handler_user_not_found(
 
 
 async def test_set_user_username_handler_user_deleted(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = SetUserUsernameHandler(user_repo, uow, event_mediator)
 
@@ -116,7 +124,7 @@ async def test_set_user_username_handler_user_deleted(
 
     command = SetUserUsername(user_id=user_id.value, username=new_username)
 
-    with pytest.raises(UserIsDeleted):
+    with pytest.raises(UserIsDeletedError):
         await handler(command)
 
     assert len(event_mediator.published_events) == 0

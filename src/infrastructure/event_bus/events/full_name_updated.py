@@ -8,7 +8,7 @@ from .base import IntegrationEvent, integration_event
 
 @dataclass(frozen=True)
 @integration_event("UsernameUpdated", exchange=USER_EXCHANGE)
-class FullNameUpdated(IntegrationEvent):  # noqa
+class FullNameUpdated(IntegrationEvent):
     user_id: UUID
     first_name: str
     last_name: str

@@ -1,6 +1,6 @@
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from functools import wraps
-from typing import Any, Coroutine, ParamSpec, TypeVar
+from typing import Any, ParamSpec, TypeVar
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -12,7 +12,7 @@ Func = Callable[Param, ReturnType]
 
 
 def exception_mapper(
-    func: Callable[Param, Coroutine[Any, Any, ReturnType]]
+    func: Callable[Param, Coroutine[Any, Any, ReturnType]],
 ) -> Callable[Param, Coroutine[Any, Any, ReturnType]]:
     @wraps(func)
     async def wrapped(*args: Param.args, **kwargs: Param.kwargs) -> ReturnType:

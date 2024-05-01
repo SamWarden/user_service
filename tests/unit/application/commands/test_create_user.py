@@ -5,7 +5,7 @@ import pytest
 from src.application.user.commands import CreateUser, CreateUserHandler
 from src.domain.user.entities import User
 from src.domain.user.events import UserCreated
-from src.domain.user.exceptions import UsernameAlreadyExists
+from src.domain.user.exceptions import UsernameAlreadyExistsError
 from src.domain.user.value_objects import FullName, UserId, Username
 from src.domain.user.value_objects.deleted_status import DeletionTime
 from tests.mocks import EventMediatorMock, UserRepoMock
@@ -13,7 +13,9 @@ from tests.mocks.uow import UnitOfWorkMock
 
 
 async def test_create_user_handler_success(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = CreateUserHandler(user_repo, uow, event_mediator)
 
@@ -50,7 +52,9 @@ async def test_create_user_handler_success(
 
 
 async def test_create_user_handler_existing_username(
-    user_repo: UserRepoMock, uow: UnitOfWorkMock, event_mediator: EventMediatorMock
+    user_repo: UserRepoMock,
+    uow: UnitOfWorkMock,
+    event_mediator: EventMediatorMock,
 ) -> None:
     handler = CreateUserHandler(user_repo, uow, event_mediator)
 
@@ -70,7 +74,7 @@ async def test_create_user_handler_existing_username(
         middle_name=None,
     )
 
-    with pytest.raises(UsernameAlreadyExists):
+    with pytest.raises(UsernameAlreadyExistsError):
         await handler(command)
 
     assert len(event_mediator.published_events) == 0

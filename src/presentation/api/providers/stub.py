@@ -1,5 +1,5 @@
 from collections.abc import Callable, Hashable
-from typing import Any
+from typing import Never
 
 
 class Stub:
@@ -7,16 +7,15 @@ class Stub:
         self._dependency = dependency
         self._kwargs = kwargs
 
-    def __call__(self):
+    def __call__(self) -> Never:
         raise NotImplementedError
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Stub):
             return self._dependency == other._dependency and self._kwargs == other._kwargs
-        else:
-            if not self._kwargs:
-                return self._dependency == other
-            return False
+        if not self._kwargs:
+            return self._dependency == other
+        return False
 
     def __hash__(self) -> int:
         if not self._kwargs:

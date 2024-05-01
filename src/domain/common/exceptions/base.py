@@ -3,8 +3,8 @@ from typing import ClassVar
 
 
 @dataclass(eq=False)
-class AppException(Exception):
-    """Base Exception"""
+class AppError(Exception):
+    """Base Error."""
 
     status: ClassVar[int] = 500
 
@@ -13,8 +13,8 @@ class AppException(Exception):
         return "An app error occurred"
 
 
-class DomainException(AppException):
-    """Base Domain Exception"""
+class DomainError(AppError):
+    """Base Domain Error."""
 
     @property
     def title(self) -> str:

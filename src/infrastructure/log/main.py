@@ -10,7 +10,7 @@ from .processors import get_render_processor
 
 def configure_logging(cfg: LoggingConfig) -> None:
     # Mute SQLAlchemy default logger handler
-    sa_log._add_default_handler = lambda _: None  # type: ignore
+    sa_log._add_default_handler = lambda _: None  # noqa
 
     common_processors = (
         structlog.stdlib.add_log_level,
@@ -24,7 +24,7 @@ def configure_logging(cfg: LoggingConfig) -> None:
             (
                 CallsiteParameter.FUNC_NAME,
                 CallsiteParameter.LINENO,
-            )
+            ),
         ),
     )
     structlog_processors = (
@@ -74,6 +74,6 @@ def configure_logging(cfg: LoggingConfig) -> None:
         processors=common_processors + structlog_processors,
         logger_factory=structlog.stdlib.LoggerFactory(),
         # wrapper_class=structlog.stdlib.AsyncBoundLoggerd,  # type: ignore  # noqa
-        wrapper_class=structlog.stdlib.BoundLogger,  # type: ignore  # noqa
+        wrapper_class=structlog.stdlib.BoundLogger,  # type: ignore
         cache_logger_on_first_use=True,
     )

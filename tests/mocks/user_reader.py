@@ -3,19 +3,19 @@ from uuid import UUID
 
 from src.application.common.pagination.dto import Pagination, PaginationResult, SortOrder
 from src.application.user import dto
-from src.application.user.exceptions import UserIdNotExist, UsernameNotExist
+from src.application.user.exceptions import UserIdNotExistError, UsernameNotExistError
 from src.application.user.interfaces import UserReader
 from src.application.user.interfaces.persistence import GetUsersFilters
 from src.domain.common.constants import Empty
 
 
 class UserReaderMock(UserReader):
-    def __init__(self):
+    def __init__(self) -> None:
         self.users: dict[UUID, dto.UserDTOs] = {}
 
     async def get_user_by_id(self, user_id: UUID) -> dto.UserDTOs:
         if user_id not in self.users:
-            raise UserIdNotExist(user_id)
+            raise UserIdNotExistError(user_id)
 
         user = self.users[user_id]
         return user
@@ -24,7 +24,7 @@ class UserReaderMock(UserReader):
         for user in self.users.values():
             if isinstance(user, dto.User) and user.username == username:
                 return user
-        raise UsernameNotExist(username)
+        raise UsernameNotExistError(username)
 
     async def get_users(self, filters: GetUsersFilters, pagination: Pagination) -> dto.Users:
         users = list(self.users.values())
