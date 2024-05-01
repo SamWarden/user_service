@@ -46,6 +46,8 @@ ignore = [
     "EM101", # Exception must not use a string literal, assign to variable first
     "ARG001", # Unused function argument: `code`
     "ARG002", # Unused method argument: `now`
+    "ISC001", # Implicitly concatenated string literals on one line
+    "COM812", # Explicitly concatenated string should be implicitly concatenated
 ]
 
 [lint.isort]
