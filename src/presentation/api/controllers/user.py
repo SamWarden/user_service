@@ -85,7 +85,7 @@ async def get_users(
     mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
     deleted: bool | None = None,
     offset: Annotated[int, Query(ge=0)] = 0,
-    limit: Annotated[int, Query(ge=0, le=1000)] = 1000,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
     order: SortOrder = SortOrder.ASC,
 ) -> OkResponse[dto.Users]:
     """Return all users."""
