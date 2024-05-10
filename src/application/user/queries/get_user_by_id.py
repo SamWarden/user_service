@@ -20,5 +20,5 @@ class GetUserByIdHandler(QueryHandler[GetUserById, dto.UserDTOs]):
 
     async def __call__(self, query: GetUserById) -> dto.UserDTOs:
         user = await self._user_reader.get_user_by_id(query.user_id)
-        logger.debug("Get use by id", extra={"user_id": query.user_id, "user": user})
+        logger.debug("Get user by id", extra={"user_id": query.user_id, "user": user})
         return user
