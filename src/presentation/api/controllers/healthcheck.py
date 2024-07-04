@@ -16,6 +16,6 @@ class OkStatus:
 OK_STATUS = OkStatus()
 
 
-@healthcheck_router.get("/", status_code=status.HTTP_200_OK)
+@healthcheck_router.get("", status_code=status.HTTP_200_OK)
 async def get_status() -> OkStatus:
     return OK_STATUS

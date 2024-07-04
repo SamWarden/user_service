@@ -7,9 +7,9 @@ uses some DDD tactical patterns and follows CQRS
 
 ## Endpoints
 
-#### GET /healthcheck/
+#### GET /healthcheck
 ```bash
-curl -X "GET" "http://localhost:5000/healthcheck/"
+curl -X "GET" "http://localhost:5000/healthcheck"
 ```
 ```json
 {"status": "ok"}

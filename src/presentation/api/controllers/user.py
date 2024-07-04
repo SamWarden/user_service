@@ -27,7 +27,7 @@ user_router = APIRouter(
 
 
 @user_router.post(
-    "/",
+    "",
     responses={
         status.HTTP_201_CREATED: {"model": dto.User},
         status.HTTP_400_BAD_REQUEST: {
@@ -79,7 +79,7 @@ async def get_user_by_id(
 
 
 @user_router.get(
-    "/",
+    "",
 )
 async def get_users(
     mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
