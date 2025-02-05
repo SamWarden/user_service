@@ -1,0 +1,64 @@
+target-version = "py311"
+line-length = 120
+
+[lint]
+select = ["ALL"]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "env",
+    "dist",
+    "build",
+    "docs",
+    "benchmarks",
+]
+ignore = [
+    "A003", # Python builtin is shadowed by class attribute {name} from {row}
+    "B008", # Do not perform function call {name} in argument defaults
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D105", # Missing docstring in magic method
+    "D107", # Missing docstring in `__init__`
+    "B024", # `Recognizer` is an abstract base class, but it has no abstract methods
+    "B027", # `PushNotifier.send` is an empty method in an abstract base class, but has no abstract decorator
+    "S101", # Use of `assert` detected
+    "ANN101", # Missing type annotation for `self` in method
+    "ANN102", # Missing type annotation for `cls` in classmethod
+    "PTH123", # `open("foo")` should be replaced by `Path("foo").open()`
+    "RET504", # Unnecessary variable assignment before `return` statement
+    "TRY003", # Avoid specifying long messages outside the exception class
+    "EM102", # Exception must not use an f-string literal, assign to variable first
+    "N999", # Invalid module name
+    "TCH003", # Move standard library import `uuid.UUID` into a type-checking block
+    "PGH003", # Use specific rule codes when ignoring type issues
+    "PGH004", # Use specific rule codes when using `noqa`
+    "SIM108", # Use ternary operator `address_id = body["address_id"] if lesson.category == CategoryEnum.B else slot.instructor.address_id` instead of if-else-block
+    "ARG005", # Unused lambda argument: `x`
+    "ANN401", # Dynamically typed expressions (typing.Any) are disallowed in `f`
+    "FBT001", # Boolean positional arg in function definition
+    "FBT002", # Boolean default value in function definition
+    "TD002", # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
+    "TD003", # Missing issue link on the line following this TODO
+    "FIX002", # Line contains TODO, consider resolving the issue
+    "EM101", # Exception must not use a string literal, assign to variable first
+    "ARG001", # Unused function argument: `code`
+    "ARG002", # Unused method argument: `now`
+    "ISC001", # Implicitly concatenated string literals on one line
+    "COM812", # Explicitly concatenated string should be implicitly concatenated
+]
+
+[lint.isort]
+combine-as-imports = true
+
+[lint.mccabe]
+max-complexity = 12
+
+[lint.pydocstyle]
+convention = "pep257"
+
+[lint.per-file-ignores]
+"**/__init__.py" = ["F401"]

@@ -1,0 +1,23 @@
+[api]
+host = "0.0.0.0"
+port = 5000
+debug = false
+
+[db]
+host = "user_service.postgres"
+port = 5432
+database = "user_service"
+user = "admin"
+password = "admin"
+echo = true
+
+[event_bus]
+host = "user_service.rabbitmq"
+port = 5672
+login = "admin"
+password = "admin"
+
+[logging]
+level = "DEBUG"
+render_json_logs = true
+#path = "./logs/logs.log"

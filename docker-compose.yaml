@@ -1,0 +1,191 @@
+version: "3.9"
+
+services:
+  api:
+    profiles: [ "api" ]
+    container_name: user_service.api
+    image: user_service
+    build:
+      context: .
+    restart: unless-stopped
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - user_service.postgres.network
+      - user_service.rabbitmq.network
+    volumes:
+      - ./config:/app/config:ro
+    environment:
+      - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
+    command: ["python", "-Om", "src"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsSL http://localhost:5000/healthcheck"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  postgres_migration:
+    profiles: [ "migration" ]
+    container_name: user_service.postgres_migration
+    image: user_service
+    build:
+      context: .
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - user_service.postgres.network
+    volumes:
+      - ./config:/app/config:ro
+      - ./alembic.ini:/app/alembic.ini:ro
+      - ./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations:ro
+    environment:
+      - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+
+  postgres:
+    profiles: [ "api", "migration" ]
+    container_name: user_service.postgres
+    image: "postgres:16-alpine"
+    hostname: user_service.postgres
+    restart: unless-stopped
+    expose:
+      - "5432"
+    ports:
+      - "127.0.0.1:15432:5432"
+    networks:
+      - user_service.postgres.network
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_USER: ${POSTGRES_USER:-$USER}
+      POSTGRES_DB: ${POSTGRES_DB:-$USER}
+    volumes:
+      - user_service.postgres.data:/var/lib/postgresql/users:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  postgres_backup:
+    profiles: [ "api" ]
+    container_name: user_service.postgres_backup
+    image: prodrigestivill/postgres-backup-local:15-alpine
+    networks:
+      - user_service.postgres.network
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-$USER}
+      - POSTGRES_USER=${POSTGRES_USER:-$USER}
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - BACKUP_DIR=/backups
+      - POSTGRES_EXTRA_OPTS=-Z6 --schema=public --blobs
+      - SCHEDULE=${POSTGRES_BACKUP_SCHEDULE:-@daily}
+      - HEALTHCHECK_PORT=8080
+    volumes:
+      - ${POSTGRES_BACKUP_DIR:-./.backups/postgres}:/backups
+
+  rabbitmq:
+    profiles: [ "api" ]
+    image: rabbitmq:3.11-management-alpine
+    container_name: user_service.rabbitmq
+    hostname: user_service.rabbitmq
+    restart: unless-stopped
+    expose:
+      # AMQP protocol port
+      - "5672"
+      # HTTP management UI
+      - "15672"
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    networks:
+      - user_service.rabbitmq.network
+    volumes:
+      - user_service.rabbitmq.data:/var/lib/rabbitmq/:rw
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-admin}
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics check_running -q"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  grafana:
+    profiles: [ "grafana" ]
+    image: grafana/grafana:9.5.2
+    container_name: user_service.grafana
+    hostname: user_service.grafana
+    restart: unless-stopped
+    expose:
+      - "3000"
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - user_service.grafana.network
+    volumes:
+      - user_service.grafana.data:/var/lib/grafana:rw
+      - ./grafana/provisioning:/etc/grafana/provisioning:rw
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - VIRTUAL_HOST=user_service.grafana
+      - NETWORK_ACCESS=internal
+      - VIRTUAL_PORT=3000
+
+  loki:
+    profiles: [ "grafana" ]
+    image: grafana/loki:2.8.2
+    container_name: user_service.loki
+    hostname: user_service.loki
+    expose:
+      - "3100"
+    volumes:
+      - ./loki/config.yaml:/etc/loki/config.yaml:ro
+      - user_service.loki.data:/tmp/:rw
+    command: -config.file=/etc/loki/config.yaml
+    restart: unless-stopped
+    networks:
+      - user_service.grafana.network
+
+  vector:
+    profiles: [ "grafana" ]
+    image: timberio/vector:0.29.1-alpine
+    container_name: user_service.vector
+    hostname: user_service.vector
+    restart: unless-stopped
+    expose:
+      - "8383"
+    networks:
+      - user_service.grafana.network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./vector/vector.toml:/etc/vector/vector.toml:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
+volumes:
+  user_service.postgres.data: {}
+  user_service.rabbitmq.data: {}
+  user_service.grafana.data: {}
+  user_service.loki.data: {}
+
+networks:
+  user_service.postgres.network: {}
+  user_service.rabbitmq.network: {}
+  user_service.grafana.network: {}

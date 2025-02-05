@@ -1,0 +1,58 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: UserServiceTest
+
+on:
+  workflow_call:
+
+  pull_request:
+    branches: [ master, dev ]
+  push:
+    branches: [ master, dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: poetry.lock
+      - name: Install dependencies
+        run: poetry install --with dev,test,lint
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: poetry.lock
+      - name: Lint with pre-commit
+        run: poetry run pre-commit run --all-files
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: poetry.lock
+      - name: Test with pytest
+        run: poetry run pytest
