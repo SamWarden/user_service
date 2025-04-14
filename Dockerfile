@@ -1,37 +1,34 @@
-FROM python:3.11-slim-buster AS python-base
+FROM python:3.13-slim-bookworm AS python-base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=off \
-    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_NO_INTERACTION=1 \
-    PYSETUP_PATH="/opt/pysetup" \
-    VENV_PATH="/opt/pysetup/.venv"
+    APP_PATH="/app" \
+    UV_VERSION="0.6.14"
 
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+ENV VIRTUAL_ENV="$APP_PATH/.venv"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+FROM python-base AS builder
 
-FROM python-base AS builder-base
 RUN apt-get update \
- && apt-get install -y --no-install-recommends gcc git
+    && apt-get install -y --no-install-recommends gcc git \
+    && rm -rf /var/lib/apt/lists/
 
-WORKDIR $PYSETUP_PATH
-COPY ./pyproject.toml ./poetry.lock ./
-RUN pip install --no-cache-dir --upgrade pip==24.0 \
- && pip install --no-cache-dir setuptools==69.5.1 wheel==0.43.0 \
- && pip install --no-cache-dir poetry==1.8.2
+WORKDIR $APP_PATH
 
-RUN poetry install --no-dev
+RUN pip install --no-cache-dir "uv==$UV_VERSION"
 
-FROM python-base AS production
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-RUN apt-get update \
- && apt-get install -y --no-install-recommends curl \
- && rm -rf /var/lib/apt/lists/*
+COPY ./pyproject.toml ./uv.lock ./
+RUN uv venv -p 3.13 \
+    && uv sync --all-extras --no-install-project
+COPY ./src ./src
+RUN uv sync --all-extras --no-editable
 
-WORKDIR /app
-COPY _src/user_service /app/user_service
+FROM python-base AS runner
+
+COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
+
 CMD ["python", "-Om", "user_service"]
