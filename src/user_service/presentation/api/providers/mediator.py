@@ -4,7 +4,7 @@ from di import ScopeState
 from didiator import Mediator
 from fastapi import Depends
 
-from user_service.infrastructure.mediator import get_mediator
+from user_service.main.mediator import get_mediator
 
 from .di import get_di_state
 

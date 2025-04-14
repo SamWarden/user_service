@@ -4,7 +4,7 @@ from di import ScopeState
 from didiator.interface.utils.di_builder import DiBuilder
 from fastapi import Depends
 
-from user_service.infrastructure.di import DiScope
+from user_service.main.di import DiScope
 
 
 def get_di_builder() -> DiBuilder:

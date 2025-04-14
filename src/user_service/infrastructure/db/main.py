@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 import orjson
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
@@ -6,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from .config import DBConfig
 
 
+@asynccontextmanager
 async def build_sa_engine(db_config: DBConfig) -> AsyncGenerator[AsyncEngine, None]:
     engine = create_async_engine(
         db_config.full_url,
@@ -23,10 +25,3 @@ async def build_sa_engine(db_config: DBConfig) -> AsyncGenerator[AsyncEngine, No
 def build_sa_session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
     session_factory = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
     return session_factory
-
-
-async def build_sa_session(
-    session_factory: async_sessionmaker[AsyncSession],
-) -> AsyncGenerator[AsyncSession, None]:
-    async with session_factory() as session:
-        yield session
