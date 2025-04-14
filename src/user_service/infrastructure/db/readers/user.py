@@ -9,13 +9,11 @@ from user_service.application.user import dto
 from user_service.application.user.interfaces.persistence import GetUsersFilters, UserReader
 from user_service.domain.common.constants import Empty
 from user_service.infrastructure.db.converters.user import convert_db_row_to_user_dto
-from user_service.infrastructure.db.exception_mapper import exception_mapper
 from user_service.infrastructure.db.models.user import USERS_TABLE
 from user_service.infrastructure.db.readers.base import SQLAlchemyReader
 
 
 class UserReaderImpl(SQLAlchemyReader, UserReader):
-    @exception_mapper
     async def get_user_by_id(self, user_id: UUID) -> dto.User | None:
         result = await self._session.execute(select(USERS_TABLE).where(USERS_TABLE.c.id == user_id))
         user_row = result.mappings().one_or_none()
@@ -24,7 +22,6 @@ class UserReaderImpl(SQLAlchemyReader, UserReader):
 
         return convert_db_row_to_user_dto(user_row)
 
-    @exception_mapper
     async def get_user_by_username(self, username: str) -> dto.User | None:
         result = await self._session.execute(select(USERS_TABLE).where(USERS_TABLE.c.username == username))
         user_row = result.mappings().one_or_none()
@@ -33,7 +30,6 @@ class UserReaderImpl(SQLAlchemyReader, UserReader):
 
         return convert_db_row_to_user_dto(user_row)
 
-    @exception_mapper
     async def get_users(self, filters: GetUsersFilters, pagination: Pagination) -> dto.Users:
         query = select(USERS_TABLE)
 
