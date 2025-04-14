@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Callable
 from typing import Any
 from uuid import UUID
@@ -5,6 +6,8 @@ from uuid import UUID
 import aio_pika
 import orjson
 import structlog
+
+logger = logging.getLogger(__name__)
 
 ProcessorType = Callable[
     [
@@ -21,7 +24,9 @@ def additionally_serialize(obj: object) -> Any:
         return str(obj)
     if isinstance(obj, aio_pika.Message):
         return obj.info()
-    raise TypeError(f"TypeError: Type is not JSON serializable: {type(obj)}")
+
+    logger.warning("Type is not JSON serializable: %s", type(obj), extra={"obj": repr(obj)})
+    return repr(obj)
 
 
 def serialize_to_json(data: Any, default: Any) -> str:

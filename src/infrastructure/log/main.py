@@ -19,7 +19,7 @@ def configure_logging(cfg: LoggingConfig) -> None:
         structlog.dev.set_exc_info,
         structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S.%f", utc=True),
         structlog.contextvars.merge_contextvars,
-        structlog.processors.dict_tracebacks,
+        structlog.processors.format_exc_info,  # print exceptions from event dict
         CallsiteParameterAdder(
             (
                 CallsiteParameter.FUNC_NAME,
@@ -33,7 +33,6 @@ def configure_logging(cfg: LoggingConfig) -> None:
         structlog.processors.UnicodeDecoder(),  # convert bytes to str
         # structlog.stdlib.render_to_log_kwargs,
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        # structlog.processors.format_exc_info,  # print exceptions from event dict
     )
     logging_processors = (structlog.stdlib.ProcessorFormatter.remove_processors_meta,)
     logging_console_processors = (
