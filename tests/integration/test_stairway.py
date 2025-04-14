@@ -15,7 +15,7 @@ from alembic.script import Script, ScriptDirectory
 
 def get_revisions(alembic_config: AlembicConfig) -> list[Script]:
     # Get directory object with Alembic migrations
-    revisions_dir = ScriptDirectory(alembic_config.get_main_option("script_location"))
+    revisions_dir = ScriptDirectory.from_config(alembic_config)
 
     # Get & sort migrations, from first to last
     revisions: list[Script] = list(revisions_dir.walk_revisions("base", "heads"))
