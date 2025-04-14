@@ -1,5 +1,8 @@
+import inspect
 from collections.abc import Callable, Hashable
-from typing import Never
+from typing import Annotated, Any, Never, ParamSpec, TypeVar
+
+from fastapi import Depends
 
 
 class Stub:
@@ -25,3 +28,28 @@ class Stub:
             *self._kwargs.items(),
         )
         return hash(serial)
+
+
+P = ParamSpec("P")
+T = TypeVar("T")
+
+
+def wrap_factory(factory: Callable[P, T], **kwargs: Callable[..., Any]) -> Callable[P, T]:
+    def provider(*args: P.args, **kwargs: P.kwargs) -> T:
+        return factory(*args, **kwargs)
+
+    factory_sig = inspect.signature(factory)
+    new_params: list[inspect.Parameter] = []
+    for param in factory_sig.parameters.values():
+        if param.name in kwargs:
+            stub = kwargs[param.annotation]
+        else:
+            stub = Stub(param.annotation)
+        new_params.append(param.replace(annotation=Annotated[param.annotation, Depends(stub)]))
+
+    provider_sig = inspect.signature(provider)
+    new_sig = provider_sig.replace(parameters=new_params, return_annotation=factory_sig.return_annotation)
+    new_hints = {param.name: param.annotation for param in new_params}
+    provider.__signature__ = new_sig  # type: ignore[attr-defined]
+    provider.__annotations__ = new_hints
+    return provider
