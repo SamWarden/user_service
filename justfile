@@ -6,7 +6,7 @@ help:
 
 # Install package with dependencies
 install:
-	poetry install --with dev,test,lint
+	uv sync --all-extras --all-groups
 
 # Run pre-commit
 lint:
@@ -37,4 +37,4 @@ migrate:
 	docker compose --profile migration up --build
 
 _py *args:
-    poetry run {{args}}
+    uv run {{args}}
