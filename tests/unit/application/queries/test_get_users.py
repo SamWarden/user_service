@@ -2,12 +2,12 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 import pytest
+from user_service.application.common.pagination.dto import Pagination, SortOrder
+from user_service.application.user import dto
+from user_service.application.user.interfaces.persistence import GetUsersFilters
+from user_service.application.user.queries.get_users import GetUsers, GetUsersHandler
+from user_service.domain.common.constants import Empty
 
-from src.application.common.pagination.dto import Pagination, SortOrder
-from src.application.user import dto
-from src.application.user.interfaces.persistence import GetUsersFilters
-from src.application.user.queries.get_users import GetUsers, GetUsersHandler
-from src.domain.common.constants import Empty
 from tests.mocks.user_reader import UserReaderMock
 
 

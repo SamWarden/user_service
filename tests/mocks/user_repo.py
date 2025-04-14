@@ -1,7 +1,7 @@
-from src.application.user.exceptions import UserIdNotExistError
-from src.application.user.interfaces import UserRepo
-from src.domain.user import entities
-from src.domain.user.value_objects import UserId, Username
+from user_service.application.user.exceptions import UserIdNotExistError
+from user_service.application.user.interfaces import UserRepo
+from user_service.domain.user import entities
+from user_service.domain.user.value_objects import UserId, Username
 
 
 class UserRepoMock(UserRepo):

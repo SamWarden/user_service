@@ -1,13 +1,13 @@
 from uuid import UUID
 
 import pytest
+from user_service.application.user.commands import CreateUser, CreateUserHandler
+from user_service.domain.user.entities import User
+from user_service.domain.user.events import UserCreated
+from user_service.domain.user.exceptions import UsernameAlreadyExistsError
+from user_service.domain.user.value_objects import FullName, UserId, Username
+from user_service.domain.user.value_objects.deleted_status import DeletionTime
 
-from src.application.user.commands import CreateUser, CreateUserHandler
-from src.domain.user.entities import User
-from src.domain.user.events import UserCreated
-from src.domain.user.exceptions import UsernameAlreadyExistsError
-from src.domain.user.value_objects import FullName, UserId, Username
-from src.domain.user.value_objects.deleted_status import DeletionTime
 from tests.mocks import EventMediatorMock, UserRepoMock
 from tests.mocks.uow import UnitOfWorkMock
 

@@ -1,4 +1,4 @@
-from src.application.common.interfaces.uow import UnitOfWork
+from user_service.application.common.interfaces.uow import UnitOfWork
 
 
 class UnitOfWorkMock(UnitOfWork):
