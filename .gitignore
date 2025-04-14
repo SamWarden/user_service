@@ -1,1 +1,3 @@
 .env
+config/config.toml
+config/prod_config.toml

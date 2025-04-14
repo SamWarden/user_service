@@ -1,0 +1,23 @@
+[api]
+host = "127.0.0.1"
+port = 5000
+debug = true
+
+[db]
+host = "localhost"
+port = 5432
+database = "user_service"
+user = "admin"
+password = "admin"
+echo = true
+
+[event_bus]
+host = "localhost"
+port = 5672
+login = "admin"
+password = "admin"
+
+[logging]
+level = "DEBUG"
+render_json_logs = false
+#path = "./logs/logs.log"
