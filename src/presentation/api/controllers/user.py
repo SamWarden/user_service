@@ -78,9 +78,7 @@ async def get_user_by_id(
     return OkResponse(result=user)
 
 
-@user_router.get(
-    "",
-)
+@user_router.get("")
 async def get_users(
     mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
     deleted: bool | None = None,
