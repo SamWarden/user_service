@@ -18,7 +18,7 @@ from user_service.application.user.commands import (
 from user_service.application.user.queries.get_user_by_id import GetUserById, GetUserByIdHandler
 from user_service.application.user.queries.get_user_by_username import GetUserByUsername, GetUserByUsernameHandler
 from user_service.application.user.queries.get_users import GetUsers, GetUsersHandler
-from user_service.domain.common.events import Event
+from user_service.domain.common.event import Event
 from user_service.infrastructure.di import DiScope
 from user_service.infrastructure.event_bus.event_handler import EventHandlerPublisher
 from user_service.infrastructure.log.event_handler import EventLogger

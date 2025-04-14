@@ -3,7 +3,6 @@ from uuid import UUID
 
 from user_service.application.common.pagination.dto import Pagination, PaginationResult, SortOrder
 from user_service.application.user import dto
-from user_service.application.user.exceptions import UserIdNotExistError, UsernameNotExistError
 from user_service.application.user.interfaces import UserReader
 from user_service.application.user.interfaces.persistence import GetUsersFilters
 from user_service.domain.common.constants import Empty
@@ -11,20 +10,17 @@ from user_service.domain.common.constants import Empty
 
 class UserReaderMock(UserReader):
     def __init__(self) -> None:
-        self.users: dict[UUID, dto.UserDTOs] = {}
+        self.users: dict[UUID, dto.User] = {}
 
-    async def get_user_by_id(self, user_id: UUID) -> dto.UserDTOs:
-        if user_id not in self.users:
-            raise UserIdNotExistError(user_id)
-
-        user = self.users[user_id]
+    async def get_user_by_id(self, user_id: UUID) -> dto.User | None:
+        user = self.users.get(user_id)
         return user
 
-    async def get_user_by_username(self, username: str) -> dto.User:
+    async def get_user_by_username(self, username: str) -> dto.User | None:
         for user in self.users.values():
-            if isinstance(user, dto.User) and user.username == username:
+            if user.username == username:
                 return user
-        raise UsernameNotExistError(username)
+        return None
 
     async def get_users(self, filters: GetUsersFilters, pagination: Pagination) -> dto.Users:
         users = list(self.users.values())
@@ -55,9 +51,9 @@ class UserReaderMock(UserReader):
             count = len(self.users)
         return count
 
-    async def add_user(self, user: dto.UserDTOs) -> None:
+    async def add_user(self, user: dto.User) -> None:
         self.users[user.id] = user
 
-    async def add_users(self, users: Sequence[dto.UserDTOs]) -> None:
+    async def add_users(self, users: Sequence[dto.User]) -> None:
         for user in users:
             await self.add_user(user)

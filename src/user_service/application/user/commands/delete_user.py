@@ -6,7 +6,7 @@ from didiator import EventMediator
 
 from user_service.application.common.command import Command, CommandHandler
 from user_service.application.common.interfaces.uow import UnitOfWork
-from user_service.application.user.interfaces import UserRepo
+from user_service.domain.user.service import UserService
 from user_service.domain.user.value_objects import UserId
 
 logger = logging.getLogger(__name__)
@@ -20,21 +20,19 @@ class DeleteUser(Command[None]):
 class DeleteUserHandler(CommandHandler[DeleteUser, None]):
     def __init__(
         self,
-        user_repo: UserRepo,
+        user_service: UserService,
         uow: UnitOfWork,
         mediator: EventMediator,
     ) -> None:
-        self._user_repo = user_repo
+        self._user_service = user_service
         self._uow = uow
         self._mediator = mediator
 
     async def __call__(self, command: DeleteUser) -> None:
         user_id = UserId(command.user_id)
 
-        user = await self._user_repo.acquire_user_by_id(user_id)
-        user.delete()
-        await self._user_repo.update_user(user)
-        await self._mediator.publish(user.pull_events())
+        await self._user_service.delete_user(user_id)
+        await self._mediator.publish(self._user_service.pull_events())
         await self._uow.commit()
 
-        logger.info("User deleted", extra={"user": user})
+        logger.info("User deleted", extra={"user_id": user_id.to_raw()})

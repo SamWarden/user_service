@@ -6,8 +6,9 @@ from user_service.application.user.exceptions import UserIdNotExistError
 from user_service.domain.user import User
 from user_service.domain.user.events import UserDeleted
 from user_service.domain.user.exceptions import UserIsDeletedError
+from user_service.domain.user.service import UserService
 from user_service.domain.user.value_objects import FullName, UserId, Username
-from user_service.domain.user.value_objects.deleted_status import DeletionTime
+from user_service.domain.user.value_objects.deletion_time import DeletionTime
 
 from tests.mocks import EventMediatorMock, UserRepoMock
 from tests.mocks.uow import UnitOfWorkMock
@@ -15,10 +16,11 @@ from tests.mocks.uow import UnitOfWorkMock
 
 async def test_delete_user_handler_success(
     user_repo: UserRepoMock,
+    user_service: UserService,
     uow: UnitOfWorkMock,
     event_mediator: EventMediatorMock,
 ) -> None:
-    handler = DeleteUserHandler(user_repo, uow, event_mediator)
+    handler = DeleteUserHandler(user_service, uow, event_mediator)
 
     user_id = UserId(UUID("123e4567-e89b-12d3-a456-426614174000"))
     username = Username("john_doe")
@@ -27,8 +29,7 @@ async def test_delete_user_handler_success(
         id=user_id,
         username=username,
         full_name=full_name,
-        deleted_at=DeletionTime(None),
-        existing_usernames={username},
+        deleted_at=DeletionTime.create_not_deleted(),
     )
     await user_repo.add_user(user)
 
@@ -38,7 +39,7 @@ async def test_delete_user_handler_success(
     assert user.id == user_id
     assert user.username == Username(None)
     assert user.full_name == full_name
-    assert user.deleted_at != DeletionTime(None)
+    assert user.deleted_at != DeletionTime.create_not_deleted()
 
     assert len(event_mediator.published_events) == 1
     published_event = event_mediator.published_events[0]
@@ -50,10 +51,11 @@ async def test_delete_user_handler_success(
 
 async def test_delete_user_handler_user_not_found(
     user_repo: UserRepoMock,
+    user_service: UserService,
     uow: UnitOfWorkMock,
     event_mediator: EventMediatorMock,
 ) -> None:
-    handler = DeleteUserHandler(user_repo, uow, event_mediator)
+    handler = DeleteUserHandler(user_service, uow, event_mediator)
 
     user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
 
@@ -69,19 +71,19 @@ async def test_delete_user_handler_user_not_found(
 
 async def test_delete_user_handler_user_already_deleted(
     user_repo: UserRepoMock,
+    user_service: UserService,
     uow: UnitOfWorkMock,
     event_mediator: EventMediatorMock,
 ) -> None:
-    handler = DeleteUserHandler(user_repo, uow, event_mediator)
+    handler = DeleteUserHandler(user_service, uow, event_mediator)
 
     user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
     user = User(
         id=UserId(user_id),
-        username=Username("john_doe"),
+        username=Username(None),
         full_name=FullName("John", "Doe"),
-        existing_usernames={Username("john_doe")},
+        deleted_at=DeletionTime.create_deleted(),
     )
-    user.delete()
     await user_repo.add_user(user)
 
     command = DeleteUser(user_id=user_id)

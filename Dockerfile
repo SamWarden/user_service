@@ -11,13 +11,13 @@ ENV PYTHONUNBUFFERED=1 \
 ENV VIRTUAL_ENV="$APP_PATH/.venv"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+WORKDIR $APP_PATH
+
 FROM python-base AS builder
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc git \
     && rm -rf /var/lib/apt/lists/
-
-WORKDIR $APP_PATH
 
 RUN pip install --no-cache-dir "uv==$UV_VERSION"
 

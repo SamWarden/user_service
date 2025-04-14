@@ -19,9 +19,9 @@ services:
       - user_service.postgres.network
       - user_service.rabbitmq.network
     volumes:
-      - ./config:/config:ro
+      - ./config:/app/config:ro
     environment:
-      - CONFIG_PATH=${CONFIG_PATH:-/config/prod_config.toml}
+      - CONFIG_PATH=${CONFIG_PATH:-/app/config/prod_config.toml}
     healthcheck:
       test: ["CMD-SHELL", "curl -fsSL http://localhost:5000/healthcheck"]
       interval: 10s
@@ -44,7 +44,6 @@ services:
     volumes:
       - ./config:/app/config:ro
       - ./alembic.ini:/app/alembic.ini:ro
-      - ./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations:ro
     environment:
       - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
     command: ["python", "-m", "alembic", "upgrade", "head"]
@@ -52,7 +51,7 @@ services:
   postgres:
     profiles: [ "api", "migration" ]
     container_name: user_service.postgres
-    image: "postgres:16-alpine"
+    image: "postgres:17-alpine"
     hostname: user_service.postgres
     restart: unless-stopped
     expose:

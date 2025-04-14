@@ -3,7 +3,7 @@ from typing import Generic, TypeVar
 
 import didiator
 
-from user_service.domain.common.events.event import Event
+from user_service.domain.common.event import Event
 
 E = TypeVar("E", bound=Event)
 

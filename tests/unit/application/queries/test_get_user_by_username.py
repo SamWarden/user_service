@@ -16,6 +16,7 @@ async def test_get_user_by_username_handler_success(user_reader: UserReaderMock)
         first_name="John",
         last_name="Doe",
         middle_name=None,
+        deleted_at=None,
     )
     await user_reader.add_user(user)
     handler = GetUserByUsernameHandler(user_reader)
@@ -34,6 +35,7 @@ async def test_get_user_by_username_handler_user_not_found(user_reader: UserRead
         first_name="John",
         last_name="Doe",
         middle_name=None,
+        deleted_at=None,
     )
     await user_reader.add_user(user)
     handler = GetUserByUsernameHandler(user_reader)

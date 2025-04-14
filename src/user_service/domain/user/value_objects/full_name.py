@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 
 from user_service.domain.common.exceptions import DomainError
-from user_service.domain.common.value_objects.base import BaseValueObject
+from user_service.domain.common.value_objects import BaseValueObject
 
 MAX_NAME_LENGTH = 32
 NAME_PATTERN = re.compile(r"[A-Za-z]+")

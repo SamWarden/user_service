@@ -1,7 +1,7 @@
 import logging
 
 from user_service.application.common.event import EventHandler
-from user_service.domain.common.events import Event
+from user_service.domain.common.event import Event
 
 logger = logging.getLogger(__name__)
 

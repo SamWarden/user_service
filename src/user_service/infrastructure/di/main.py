@@ -10,9 +10,11 @@ from didiator.utils.di_builder import DiBuilderImpl
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from user_service.application.common.interfaces.uow import UnitOfWork
-from user_service.application.user.interfaces.persistence import UserReader, UserRepo
+from user_service.application.user.interfaces.persistence import UserReader
+from user_service.domain.user.interfaces.repo import UserRepo
 from user_service.infrastructure.db.main import build_sa_engine, build_sa_session, build_sa_session_factory
-from user_service.infrastructure.db.repositories.user import UserReaderImpl, UserRepoImpl
+from user_service.infrastructure.db.readers import UserReaderImpl
+from user_service.infrastructure.db.repositories.user import UserRepoImpl
 from user_service.infrastructure.di import DiScope
 from user_service.infrastructure.event_bus.event_bus import EventBusImpl
 from user_service.infrastructure.mediator import get_mediator

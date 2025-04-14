@@ -1,6 +1,3 @@
-from .dto import DeletedUser, User
+from .dto import User
 
-__all__ = (
-    "DeletedUser",
-    "User",
-)
+__all__ = ("User",)

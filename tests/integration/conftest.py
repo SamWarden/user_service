@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.fixture(scope="session")
 def postgres_url() -> Generator[str, None, None]:
-    postgres = PostgresContainer("postgres:15-alpine")
+    postgres = PostgresContainer("postgres:17-alpine")
     if os.name == "nt":  # TODO: workaround from testcontainers/testcontainers-python#108
         postgres.get_container_host_ip = lambda: "localhost"
     try:

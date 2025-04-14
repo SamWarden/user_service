@@ -1,6 +1,6 @@
 from user_service.application.common.event import EventHandler
 from user_service.application.common.exceptions import MappingError
-from user_service.domain.common.events import Event
+from user_service.domain.common.event import Event
 from user_service.infrastructure.event_bus.converters import convert_domain_event_to_integration
 from user_service.infrastructure.event_bus.event_bus import EventBusImpl
 

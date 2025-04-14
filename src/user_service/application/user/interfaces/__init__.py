@@ -1,6 +1,3 @@
-from .persistence import UserReader, UserRepo
+from .persistence import UserReader
 
-__all__ = (
-    "UserReader",
-    "UserRepo",
-)
+__all__ = ("UserReader",)

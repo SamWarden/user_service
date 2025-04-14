@@ -1,16 +1,13 @@
 from abc import ABC
-from dataclasses import dataclass, field
 
-from user_service.domain.common.events.event import Event
-
-from .entity import Entity
+from user_service.domain.common.event import Event
 
 
-@dataclass
-class AggregateRoot(Entity, ABC):
-    _events: list[Event] = field(default_factory=list, init=False, repr=False, hash=False, compare=False)
+class BaseService(ABC):
+    def __init__(self) -> None:
+        self._events: list[Event] = []
 
-    def record_event(self, event: Event) -> None:
+    def _record_event(self, event: Event) -> None:
         self._events.append(event)
 
     def get_events(self) -> list[Event]:

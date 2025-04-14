@@ -1,6 +1,3 @@
-from .user import UserReaderImpl, UserRepoImpl
+from .user import UserRepoImpl
 
-__all__ = (
-    "UserReaderImpl",
-    "UserRepoImpl",
-)
+__all__ = ("UserRepoImpl",)

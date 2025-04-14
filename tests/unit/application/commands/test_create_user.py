@@ -5,8 +5,9 @@ from user_service.application.user.commands import CreateUser, CreateUserHandler
 from user_service.domain.user.entities import User
 from user_service.domain.user.events import UserCreated
 from user_service.domain.user.exceptions import UsernameAlreadyExistsError
+from user_service.domain.user.service import UserService
 from user_service.domain.user.value_objects import FullName, UserId, Username
-from user_service.domain.user.value_objects.deleted_status import DeletionTime
+from user_service.domain.user.value_objects.deletion_time import DeletionTime
 
 from tests.mocks import EventMediatorMock, UserRepoMock
 from tests.mocks.uow import UnitOfWorkMock
@@ -14,10 +15,11 @@ from tests.mocks.uow import UnitOfWorkMock
 
 async def test_create_user_handler_success(
     user_repo: UserRepoMock,
+    user_service: UserService,
     uow: UnitOfWorkMock,
     event_mediator: EventMediatorMock,
 ) -> None:
-    handler = CreateUserHandler(user_repo, uow, event_mediator)
+    handler = CreateUserHandler(user_service, uow, event_mediator)
 
     user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
     command = CreateUser(
@@ -53,10 +55,11 @@ async def test_create_user_handler_success(
 
 async def test_create_user_handler_existing_username(
     user_repo: UserRepoMock,
+    user_service: UserService,
     uow: UnitOfWorkMock,
     event_mediator: EventMediatorMock,
 ) -> None:
-    handler = CreateUserHandler(user_repo, uow, event_mediator)
+    handler = CreateUserHandler(user_service, uow, event_mediator)
 
     user_id = UUID("123e4567-e89b-12d3-a456-426614174000")
     existing_user = User(

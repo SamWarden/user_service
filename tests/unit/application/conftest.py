@@ -1,4 +1,6 @@
 import pytest
+from user_service.domain.user.interfaces.repo import UserRepo
+from user_service.domain.user.service import UserService
 
 from tests.mocks import EventMediatorMock, UserRepoMock
 from tests.mocks.uow import UnitOfWorkMock
@@ -23,3 +25,8 @@ def event_mediator() -> EventMediatorMock:
 @pytest.fixture()
 def uow() -> UnitOfWorkMock:
     return UnitOfWorkMock()
+
+
+@pytest.fixture()
+def user_service(user_repo: UserRepo) -> UserService:
+    return UserService(user_repo)

@@ -37,7 +37,7 @@ user_router = APIRouter(
 @user_router.post(
     "",
     responses={
-        status.HTTP_201_CREATED: {"model": dto.User},
+        status.HTTP_201_CREATED: {"model": OkResponse[None]},
         status.HTTP_400_BAD_REQUEST: {
             "model": ErrorResponse[TooLongUsernameError | EmptyUsernameError | WrongUsernameFormatError],
         },
@@ -50,10 +50,9 @@ user_router = APIRouter(
 async def create_user(
     create_user_command: CreateUser,
     mediator: Annotated[Mediator, Depends(Stub(Mediator))],
-) -> OkResponse[dto.UserDTOs]:
-    user_id = await mediator.send(create_user_command)
-    user = await mediator.query(GetUserById(user_id=user_id))
-    return OkResponse(result=user)
+) -> OkResponse[dto.User]:
+    await mediator.send(create_user_command)
+    return OkResponse()
 
 
 @user_router.get(
@@ -74,14 +73,14 @@ async def get_user_by_username(
 @user_router.get(
     "/{user_id}",
     responses={
-        status.HTTP_200_OK: {"model": dto.UserDTOs},
+        status.HTTP_200_OK: {"model": dto.User},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserIdNotExistError]},
     },
 )
 async def get_user_by_id(
     user_id: UUID,
     mediator: Annotated[QueryMediator, Depends(Stub(QueryMediator))],
-) -> OkResponse[dto.UserDTOs]:
+) -> OkResponse[dto.User]:
     user = await mediator.query(GetUserById(user_id=user_id))
     return OkResponse(result=user)
 
@@ -111,7 +110,7 @@ async def get_users(
 @user_router.put(
     "/{user_id}/username",
     responses={
-        status.HTTP_200_OK: {"model": dto.User},
+        status.HTTP_200_OK: {"model": OkResponse[None]},
         status.HTTP_400_BAD_REQUEST: {
             "model": ErrorResponse[
                 UserIdNotExistError | TooLongUsernameError | EmptyUsernameError | WrongUsernameFormatError
@@ -133,7 +132,7 @@ async def set_user_username(
 @user_router.put(
     "/{user_id}/full-name",
     responses={
-        status.HTTP_200_OK: {"model": dto.User},
+        status.HTTP_200_OK: {"model": OkResponse[None]},
         status.HTTP_400_BAD_REQUEST: {
             "model": ErrorResponse[UserIdNotExistError | EmptyNameError | WrongNameFormatError | TooLongNameError],
         },
@@ -158,7 +157,7 @@ async def set_user_full_name(
 @user_router.delete(
     "/{user_id}",
     responses={
-        status.HTTP_200_OK: {"model": dto.DeletedUser},
+        status.HTTP_200_OK: {"model": OkResponse[None]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserIdNotExistError]},
         status.HTTP_409_CONFLICT: {"model": ErrorResponse[UserIsDeletedError]},
     },

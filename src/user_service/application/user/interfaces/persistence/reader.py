@@ -13,10 +13,10 @@ class GetUsersFilters:
 
 
 class UserReader(Protocol):
-    async def get_user_by_id(self, user_id: UUID) -> dto.UserDTOs:
+    async def get_user_by_id(self, user_id: UUID) -> dto.User | None:
         raise NotImplementedError
 
-    async def get_user_by_username(self, username: str) -> dto.User:
+    async def get_user_by_username(self, username: str) -> dto.User | None:
         raise NotImplementedError
 
     async def get_users(self, filters: GetUsersFilters, pagination: Pagination) -> dto.Users:

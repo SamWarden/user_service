@@ -17,7 +17,9 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column("users", sa.Column("deleted_at", sa.DateTime(), server_default=sa.text("NULL"), nullable=True))
+    op.add_column(
+        "users", sa.Column("deleted_at", sa.DateTime(timezone=True), server_default=sa.text("NULL"), nullable=True)
+    )
     # set deleted_at to the updated_at value for all existing users
     op.execute("UPDATE users SET deleted_at = updated_at WHERE deleted IS true")
     op.drop_column("users", "deleted")
