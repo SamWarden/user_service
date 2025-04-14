@@ -33,5 +33,5 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY ./src /app/src
-CMD ["python", "-Om", "src"]
+COPY _src/user_service /app/user_service
+CMD ["python", "-Om", "user_service"]

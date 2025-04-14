@@ -1,13 +1,13 @@
 from uuid import UUID
 
 import pytest
+from user_service.application.user.commands import SetUserFullName, SetUserFullNameHandler
+from user_service.application.user.exceptions import UserIdNotExistError
+from user_service.domain.user import User
+from user_service.domain.user.events import FullNameUpdated
+from user_service.domain.user.exceptions import UserIsDeletedError
+from user_service.domain.user.value_objects import FullName, UserId, Username
 
-from src.application.user.commands import SetUserFullName, SetUserFullNameHandler
-from src.application.user.exceptions import UserIdNotExistError
-from src.domain.user import User
-from src.domain.user.events import FullNameUpdated
-from src.domain.user.exceptions import UserIsDeletedError
-from src.domain.user.value_objects import FullName, UserId, Username
 from tests.mocks import EventMediatorMock, UserRepoMock
 from tests.mocks.uow import UnitOfWorkMock
 

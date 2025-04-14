@@ -1,10 +1,10 @@
 from uuid import UUID
 
 import pytest
+from user_service.application.user import dto
+from user_service.application.user.exceptions import UserIdNotExistError
+from user_service.application.user.queries.get_user_by_id import GetUserById, GetUserByIdHandler
 
-from src.application.user import dto
-from src.application.user.exceptions import UserIdNotExistError
-from src.application.user.queries.get_user_by_id import GetUserById, GetUserByIdHandler
 from tests.mocks.user_reader import UserReaderMock
 
 

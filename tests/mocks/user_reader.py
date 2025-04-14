@@ -1,12 +1,12 @@
 from collections.abc import Sequence
 from uuid import UUID
 
-from src.application.common.pagination.dto import Pagination, PaginationResult, SortOrder
-from src.application.user import dto
-from src.application.user.exceptions import UserIdNotExistError, UsernameNotExistError
-from src.application.user.interfaces import UserReader
-from src.application.user.interfaces.persistence import GetUsersFilters
-from src.domain.common.constants import Empty
+from user_service.application.common.pagination.dto import Pagination, PaginationResult, SortOrder
+from user_service.application.user import dto
+from user_service.application.user.exceptions import UserIdNotExistError, UsernameNotExistError
+from user_service.application.user.interfaces import UserReader
+from user_service.application.user.interfaces.persistence import GetUsersFilters
+from user_service.domain.common.constants import Empty
 
 
 class UserReaderMock(UserReader):
