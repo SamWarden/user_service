@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api:
     profiles: [ "api" ]
@@ -21,10 +19,9 @@ services:
       - user_service.postgres.network
       - user_service.rabbitmq.network
     volumes:
-      - ./config:/app/config:ro
+      - ./config:/config:ro
     environment:
-      - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
-    command: ["python", "-Om", "src"]
+      - CONFIG_PATH=${CONFIG_PATH:-/config/prod_config.toml}
     healthcheck:
       test: ["CMD-SHELL", "curl -fsSL http://localhost:5000/healthcheck"]
       interval: 10s
