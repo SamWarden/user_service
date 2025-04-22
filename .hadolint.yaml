@@ -1,5 +1,4 @@
 ignored:
   - DL3008
-  - DL3059
 trustedRegistries:
   - docker.io
