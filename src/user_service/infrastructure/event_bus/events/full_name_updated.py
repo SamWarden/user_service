@@ -7,7 +7,7 @@ from .base import IntegrationEvent, integration_event
 
 
 @dataclass(frozen=True)
-@integration_event("UsernameUpdated", exchange=USER_EXCHANGE)
+@integration_event("FullNameUpdated", exchange=USER_EXCHANGE)
 class FullNameUpdated(IntegrationEvent):
     user_id: UUID
     first_name: str

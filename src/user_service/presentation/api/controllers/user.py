@@ -50,7 +50,7 @@ user_router = APIRouter(
 async def create_user(
     create_user_command: CreateUser,
     mediator: Annotated[Mediator, Depends(Stub(Mediator))],
-) -> OkResponse[dto.User]:
+) -> OkResponse[None]:
     await mediator.send(create_user_command)
     return OkResponse()
 
