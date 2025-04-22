@@ -17,10 +17,10 @@ from user_service.infrastructure.db.repositories.user import UserRepoImpl
 from user_service.infrastructure.event_bus.event_bus import EventBusImpl
 from user_service.infrastructure.message_broker.interface import MessageBroker
 from user_service.infrastructure.message_broker.message_broker import MessageBrokerImpl
-from user_service.infrastructure.uow import build_uow
 from user_service.main.di import DiScope
 from user_service.main.di.db import build_sa_session
 from user_service.main.di.message_broker import build_rq_channel, build_rq_transaction
+from user_service.main.di.uow import build_uow
 from user_service.main.mediator import get_mediator
 
 
