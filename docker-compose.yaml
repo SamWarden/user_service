@@ -133,7 +133,7 @@ services:
       - user_service.grafana.network
     volumes:
       - user_service.grafana.data:/var/lib/grafana:rw
-      - ./grafana/provisioning:/etc/grafana/provisioning:rw
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:rw
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
@@ -150,7 +150,7 @@ services:
     expose:
       - "3100"
     volumes:
-      - ./loki/config.yaml:/etc/loki/config.yaml:ro
+      - ./monitoring/loki/config.yaml:/etc/loki/config.yaml:ro
       - user_service.loki.data:/tmp/:rw
     command: -config.file=/etc/loki/config.yaml
     restart: unless-stopped
@@ -169,19 +169,26 @@ services:
       - user_service.grafana.network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./vector/vector.toml:/etc/vector/vector.toml:ro
+      - ./monitoring/vector/vector.toml:/etc/vector/vector.toml:ro
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
 
 volumes:
-  user_service.postgres.data: {}
-  user_service.rabbitmq.data: {}
-  user_service.grafana.data: {}
-  user_service.loki.data: {}
+  user_service.postgres.data:
+    name: user_service.postgres.data
+  user_service.rabbitmq.data:
+    name: user_service.rabbitmq.data
+  user_service.grafana.data:
+    name: user_service.grafana.data
+  user_service.loki.data:
+    name: user_service.loki.data
 
 networks:
-  user_service.postgres.network: {}
-  user_service.rabbitmq.network: {}
-  user_service.grafana.network: {}
+  user_service.postgres.network:
+    name: user_service.postgres.network
+  user_service.rabbitmq.network:
+    name: user_service.rabbitmq.network
+  user_service.grafana.network:
+    name: user_service.grafana.network
