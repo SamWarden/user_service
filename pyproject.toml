@@ -44,6 +44,9 @@ lint = [
     "pylint==3.3.*",
 ]
 
+[project.scripts]
+user_service = "user_service.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/SamWarden/user_service"
 Repository = "https://github.com/SamWarden/user_service"

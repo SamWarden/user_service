@@ -14,7 +14,7 @@ from user_service.presentation.api.main import init_api, run_api
 logger = logging.getLogger(__name__)
 
 
-async def main() -> None:
+async def async_main() -> None:
     config = load_config(Config)
     configure_logging(config.logging)
 
@@ -40,5 +40,9 @@ async def main() -> None:
             await run_api(app, config.api)
 
 
+def main() -> None:
+    asyncio.run(async_main())
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
