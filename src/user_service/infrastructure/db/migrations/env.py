@@ -20,7 +20,10 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 if not (FULL_URL := config.get_main_option("sqlalchemy.url")):
-    FULL_URL = load_config(DBConfig, "db").full_url
+    try:
+        FULL_URL = load_config(DBConfig, "db").full_url
+    except FileNotFoundError:
+        FULL_URL = None
 
 TARGET_METADATA = BaseModel.metadata
 
