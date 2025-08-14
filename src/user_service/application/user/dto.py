@@ -14,6 +14,7 @@ class User(DTO):
     first_name: str
     last_name: str
     middle_name: str | None
+    avatar_id: UUID | None
     deleted_at: None | datetime
 
     @property

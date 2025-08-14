@@ -6,7 +6,13 @@ from fastapi import APIRouter, Depends, Query, status
 
 from user_service.application.common.pagination.dto import Pagination, SortOrder
 from user_service.application.user import dto
-from user_service.application.user.commands import CreateUser, DeleteUser, SetUserFullName
+from user_service.application.user.commands import (
+    CreateUser,
+    DeleteUser,
+    DeleteUserAvatar,
+    SetUserAvatar,
+    SetUserFullName,
+)
 from user_service.application.user.commands.set_user_username import SetUserUsername
 from user_service.application.user.exceptions import (
     UserIdAlreadyExistsError,
@@ -14,16 +20,30 @@ from user_service.application.user.exceptions import (
     UsernameNotExistError,
 )
 from user_service.application.user.interfaces.persistence import GetUsersFilters
-from user_service.application.user.queries import GetUserById, GetUserByUsername, GetUsers
+from user_service.application.user.queries import (
+    GetUserById,
+    GetUserByUsername,
+    GetUsers,
+)
 from user_service.domain.common.constants import Empty
-from user_service.domain.user.exceptions import UserIsDeletedError, UsernameAlreadyExistsError
-from user_service.domain.user.value_objects.full_name import EmptyNameError, TooLongNameError, WrongNameFormatError
+from user_service.domain.user.exceptions import (
+    UserIsDeletedError,
+    UsernameAlreadyExistsError,
+)
+from user_service.domain.user.value_objects.full_name import (
+    EmptyNameError,
+    TooLongNameError,
+    WrongNameFormatError,
+)
 from user_service.domain.user.value_objects.username import (
     EmptyUsernameError,
     TooLongUsernameError,
     WrongUsernameFormatError,
 )
 from user_service.presentation.api.controllers import requests
+from user_service.presentation.api.controllers.requests.set_user_avatar import (
+    SetUserAvatarData,
+)
 from user_service.presentation.api.controllers.responses import ErrorResponse
 from user_service.presentation.api.controllers.responses.base import OkResponse
 from user_service.presentation.api.providers.stub import Stub
@@ -39,10 +59,14 @@ user_router = APIRouter(
     responses={
         status.HTTP_201_CREATED: {"model": OkResponse[None]},
         status.HTTP_400_BAD_REQUEST: {
-            "model": ErrorResponse[TooLongUsernameError | EmptyUsernameError | WrongUsernameFormatError],
+            "model": ErrorResponse[
+                TooLongUsernameError | EmptyUsernameError | WrongUsernameFormatError
+            ],
         },
         status.HTTP_409_CONFLICT: {
-            "model": ErrorResponse[UsernameAlreadyExistsError | UserIdAlreadyExistsError],
+            "model": ErrorResponse[
+                UsernameAlreadyExistsError | UserIdAlreadyExistsError
+            ],
         },
     },
     status_code=status.HTTP_201_CREATED,
@@ -113,10 +137,15 @@ async def get_users(
         status.HTTP_200_OK: {"model": OkResponse[None]},
         status.HTTP_400_BAD_REQUEST: {
             "model": ErrorResponse[
-                UserIdNotExistError | TooLongUsernameError | EmptyUsernameError | WrongUsernameFormatError
+                UserIdNotExistError
+                | TooLongUsernameError
+                | EmptyUsernameError
+                | WrongUsernameFormatError
             ],
         },
-        status.HTTP_409_CONFLICT: {"model": ErrorResponse[UserIsDeletedError | UsernameAlreadyExistsError]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse[UserIsDeletedError | UsernameAlreadyExistsError]
+        },
     },
 )
 async def set_user_username(
@@ -124,7 +153,9 @@ async def set_user_username(
     set_user_username_data: requests.SetUserUsernameData,
     mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
 ) -> OkResponse[None]:
-    set_user_username_command = SetUserUsername(user_id=user_id, username=set_user_username_data.username)
+    set_user_username_command = SetUserUsername(
+        user_id=user_id, username=set_user_username_data.username
+    )
     await mediator.send(set_user_username_command)
     return OkResponse()
 
@@ -134,7 +165,12 @@ async def set_user_username(
     responses={
         status.HTTP_200_OK: {"model": OkResponse[None]},
         status.HTTP_400_BAD_REQUEST: {
-            "model": ErrorResponse[UserIdNotExistError | EmptyNameError | WrongNameFormatError | TooLongNameError],
+            "model": ErrorResponse[
+                UserIdNotExistError
+                | EmptyNameError
+                | WrongNameFormatError
+                | TooLongNameError
+            ],
         },
         status.HTTP_409_CONFLICT: {"model": ErrorResponse[UserIsDeletedError]},
     },
@@ -151,6 +187,42 @@ async def set_user_full_name(
         middle_name=set_user_full_name_data.middle_name,
     )
     await mediator.send(set_user_full_name_command)
+    return OkResponse()
+
+
+@user_router.put(
+    "/{user_id}/avatar",
+    responses={
+        status.HTTP_200_OK: {"model": OkResponse[None]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserIdNotExistError]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[UserIsDeletedError]},
+    },
+)
+async def set_user_avatar(
+    user_id: UUID,
+    set_user_avatar_data: SetUserAvatarData,
+    mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
+) -> OkResponse[None]:
+    set_user_avatar_command = SetUserAvatar(
+        user_id=user_id, avatar_id=set_user_avatar_data.avatar_id
+    )
+    await mediator.send(set_user_avatar_command)
+    return OkResponse()
+
+
+@user_router.delete(
+    "/{user_id}/avatar",
+    responses={
+        status.HTTP_200_OK: {"model": OkResponse[None]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[UserIdNotExistError]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[UserIsDeletedError]},
+    },
+)
+async def delete_user_avatar(
+    user_id: UUID,
+    mediator: Annotated[CommandMediator, Depends(Stub(CommandMediator))],
+) -> OkResponse[None]:
+    await mediator.send(DeleteUserAvatar(user_id=user_id))
     return OkResponse()
 
 

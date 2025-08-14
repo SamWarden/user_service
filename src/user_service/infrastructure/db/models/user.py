@@ -14,6 +14,7 @@ USERS_TABLE = sa.Table(
     sa.Column("first_name", sa.String),
     sa.Column("last_name", sa.String),
     sa.Column("middle_name", sa.String),
+    sa.Column("avatar_id", sa.UUID(as_uuid=True), nullable=True),
     sa.Column("deleted_at", sa.DateTime(timezone=True), server_default=sa.text("NULL"), nullable=True),
 )
 
@@ -29,6 +30,7 @@ mapper_registry.map_imperatively(
             USERS_TABLE.c.last_name,
             USERS_TABLE.c.middle_name,
         ),
+        "avatar_id": composite(vo.AvatarId, USERS_TABLE.c.avatar_id),
         "deleted_at": composite(vo.DeletionTime, USERS_TABLE.c.deleted_at),
     },
     column_prefix="_",

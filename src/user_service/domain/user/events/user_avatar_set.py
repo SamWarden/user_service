@@ -1,3 +1,4 @@
+"""User avatar updated event."""
 import dataclasses
 from uuid import UUID
 
@@ -5,10 +6,8 @@ from user_service.domain.common.event import Event
 
 
 @dataclasses.dataclass(frozen=True)
-class UserCreated(Event):
+class UserAvatarUpdated(Event):
+    """User avatar updated event."""
+
     user_id: UUID
-    username: str
-    first_name: str
-    last_name: str
-    middle_name: str | None
-    avatar_id: UUID | None
+    avatar_id: UUID

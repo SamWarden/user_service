@@ -10,5 +10,6 @@ def convert_db_row_to_user_dto(user_row: Any) -> dto.User:
         first_name=user_row.first_name,
         last_name=user_row.last_name,
         middle_name=user_row.middle_name,
+        avatar_id=user_row.avatar_id,
         deleted_at=user_row.deleted_at,
     )

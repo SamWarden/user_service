@@ -1,10 +1,25 @@
 from user_service.application.user.exceptions import UserIdNotExistError
 from user_service.domain.common.service import BaseService
 from user_service.domain.user import entities
-from user_service.domain.user.events import FullNameUpdated, UserCreated, UserDeleted, UsernameUpdated
-from user_service.domain.user.exceptions import UserIsDeletedError, UsernameAlreadyExistsError
+from user_service.domain.user.events import (
+    FullNameUpdated,
+    UserAvatarDeleted,
+    UserAvatarUpdated,
+    UserCreated,
+    UserDeleted,
+    UsernameUpdated,
+)
+from user_service.domain.user.exceptions import (
+    UserIsDeletedError,
+    UsernameAlreadyExistsError,
+)
 from user_service.domain.user.interfaces.repo import UserRepo
-from user_service.domain.user.value_objects import FullName, UserId, Username
+from user_service.domain.user.value_objects import (
+    AvatarId,
+    FullName,
+    UserId,
+    Username,
+)
 from user_service.domain.user.value_objects.deletion_time import DeletionTime
 
 
@@ -18,12 +33,13 @@ class UserService(BaseService):
         user_id: UserId,
         username: Username,
         full_name: FullName,
+        avatar_id: AvatarId | None,
     ) -> entities.User:
         username_exists = await self._user_repo.check_username_exists(username)
         if username_exists:
             raise UsernameAlreadyExistsError(username.to_raw())
 
-        user = entities.User(user_id, username, full_name)
+        user = entities.User(user_id, username, full_name, avatar_id=avatar_id)
         await self._user_repo.add_user(user)
         self._record_event(
             UserCreated(
@@ -32,6 +48,7 @@ class UserService(BaseService):
                 full_name.first_name,
                 full_name.last_name,
                 full_name.middle_name,
+                avatar_id.to_raw() if avatar_id else None,
             ),
         )
         return user
@@ -64,6 +81,26 @@ class UserService(BaseService):
                 user.full_name.middle_name,
             ),
         )
+
+    async def set_user_avatar(self, user_id: UserId, avatar_id: AvatarId) -> None:
+        user = await self._user_repo.acquire_user_by_id(user_id)
+        if user is None:
+            raise UserIdNotExistError(user_id.to_raw())
+        self._validate_user_not_deleted(user)
+
+        user.avatar_id = avatar_id
+
+        self._record_event(UserAvatarUpdated(user.id.to_raw(), avatar_id.to_raw()))
+
+    async def delete_user_avatar(self, user_id: UserId) -> None:
+        user = await self._user_repo.acquire_user_by_id(user_id)
+        if user is None:
+            raise UserIdNotExistError(user_id.to_raw())
+        self._validate_user_not_deleted(user)
+
+        user.avatar_id = None
+
+        self._record_event(UserAvatarDeleted(user.id.to_raw()))
 
     async def delete_user(self, user_id: UserId) -> None:
         user = await self._user_repo.acquire_user_by_id(user_id)
