@@ -19,9 +19,7 @@ class UserService(BaseService):
         username: Username,
         full_name: FullName,
     ) -> entities.User:
-        username_exists = await self._user_repo.check_username_exists(username)
-        if username_exists:
-            raise UsernameAlreadyExistsError(username.to_raw())
+        await self._ensure_username_not_exist(username)
 
         user = entities.User(user_id, username, full_name)
         await self._user_repo.add_user(user)
