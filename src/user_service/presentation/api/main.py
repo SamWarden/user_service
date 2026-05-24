@@ -1,3 +1,5 @@
+import os
+import sys
 import logging
 
 import uvicorn
@@ -16,6 +18,13 @@ from .config import APIConfig
 logger = logging.getLogger(__name__)
 
 
+def _validate_api_key() -> None:
+    if not os.getenv("API_KEY"):
+        print("fatal: API_KEY environment variable is not set.", file=sys.stderr)
+        print("Generate one with: python -c 'import secrets; print(secrets.token_urlsafe(32))'", file=sys.stderr)
+        sys.exit(1)
+
+
 def init_api(
     mediator: Mediator,
     di_builder: DiBuilder,
@@ -23,6 +32,7 @@ def init_api(
     debug: bool = __debug__,
 ) -> FastAPI:
     logger.debug("Initialize API")
+    _validate_api_key()
     app = FastAPI(
         debug=debug,
         title="User service",

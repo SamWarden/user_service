@@ -24,6 +24,7 @@ from user_service.domain.user.value_objects.username import (
     WrongUsernameFormatError,
 )
 from user_service.presentation.api.controllers import requests
+from user_service.presentation.api.controllers.auth import ApiKeyAuth, get_api_key_auth
 from user_service.presentation.api.controllers.responses import ErrorResponse
 from user_service.presentation.api.controllers.responses.base import OkResponse
 from user_service.presentation.api.providers.stub import Stub
@@ -31,6 +32,7 @@ from user_service.presentation.api.providers.stub import Stub
 user_router = APIRouter(
     prefix="/users",
     tags=["users"],
+    dependencies=[Depends(get_api_key_auth)],
 )
 
 
